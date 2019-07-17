@@ -58,8 +58,8 @@ var colorPicker = (function(){
         };
 
         //Получаем стэк полей input к которым прикрепляется виджет
-        var DOMstack = [].slice.call(document.querySelectorAll(typeof params === "string" ? params : params.selector));
-        if(!DOMstack.length){
+        var inputStackDOM = [].slice.call(document.querySelectorAll(typeof params === "string" ? params : params.selector));
+        if(!inputStackDOM.length){
             var input = document.querySelectorAll("input");
             if(input.length){
                 console.warn("Вы передали некорректный селектор!\nВиджет colorpicker не прикреплён ни к одному из DOM-элементов input\n\
@@ -74,34 +74,34 @@ var colorPicker = (function(){
             return undefined;
         }
 
-        //К элементам input прикрепляем DOM-элементы для взаимодействия с виджетом и для этого меняем css-стили
-        var df = document.createDocumentFragment(),
-            panelStack = [];
+        //Элементам input назначается событие клик, при клике на котором появляется colorPicker
+        inputStackDOM.forEach(function(input){
 
-        DOMstack.forEach(function(input){
-            var position = getComputedStyle(input).getPropertyValue("position"),
-                inputSize = getInputSizeAndPosition(input);
+            var position = getComputedStyle(input).getPropertyValue("position");
 
             if(position === "static"){
                 input.style.position = "relative";
             }
 
-            var panel = createWidfetPanel(inputSize, {width: 200, height: 200});
-            var close = panel.querySelector(".close");
-
-            panelStack.push(panel);
-
-            addEventsListeners(input, panel, close, panelStack, DOMstack);
-
-            df.appendChild(panel);
         });
 
-        //Вставляем панели виджета в DOM
-        document.body.appendChild(df);
+        var paramsOfcreateWidgetDOMElement = {
+            widgetSize: {width: 200, height: 200},
+            wayOfGettingColor: wayOfGettingColor, 
+            colorFormats: colorFormats, 
+            matchFormatToMethod: matchFormatToMethod, 
+            lang: lang
+        };
+
+        var widgetDOM = createWidgetDOMElement(paramsOfcreateWidgetDOMElement); //Задаются размеры виджета то есть окошка colorPicker
+        document.body.appendChild(widgetDOM); //Помещаем colorPicker в DOM-дерево
+        bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition);
 
     //конец функции colorPicker
     }
 
+    //Получить размеры DOM-элемента, а также абсолютную позицию top, left
+    //определенного как параметр и конечно переданного в качестве аргумента при вызове ф-ии
     function getInputSizeAndPosition(input){
         var
             rect = input.getBoundingClientRect(),
@@ -115,14 +115,14 @@ var colorPicker = (function(){
         };
     }
 
-    function createWidfetPanel(inputSize, panelSize){
+    function createWidgetDOMElement(params){
+        var p = params; 
+        
         var div = document.createElement("div"),
             mu = "px";
             div.style.position = "absolute";
             div.style.width = panelSize.width + mu;
             div.style.height = panelSize.height + mu;
-            div.style.top = inputSize.top + inputSize.height + mu;
-            div.style.left = inputSize.left + mu;
             div.style.border = "2px solid red";
             div.style.display = "none";
 
@@ -131,38 +131,47 @@ var colorPicker = (function(){
         return div;
     }
 
-    function addEventsListeners(input, panel, close, panelStack, DOMstack){
+    function bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition){
         
-        input.addEventListener("click", clickInput, false);
-        panel.addEventListener("click", clickPanel, false);
-        close.addEventListener("click", clickClose, false);
+        inputStackDOM.forEach(function(input){ 
+            input.addEventListener("click", clickInput, false); 
+        });
 
+        var close = widgetDOM.querySelector(".close");
+        close.addEventListener("click", clickClose, false);
+        
         function clickInput(e){
-            var t = e.target; 
+            var t = e.target,
+                inputSizeAndPosition = getInputSizeAndPosition(t), 
+                mu = "px";
             
             if(t.getAttribute("data-is-colorpicker-opened") === "true")
                 return false;
 
-            panelStack.forEach(function(input){ 
-                input.style.display = "none"; 
+            widgetDOM.style.display = "none";
+
+            inputStackDOM.forEach(function(input){
+                input.removeAttribute("data-is-colorpicker-opened");
             });
 
-            DOMstack.forEach(function(input){input.removeAttribute("data-is-colorpicker-opened");})
+            t.setAttribute("data-is-colorpicker-opened", true);
 
-            input.setAttribute("data-is-colorpicker-opened", true);
-            panel.style.display = "block";
-            
+            widgetDOM.style.top = inputSizeAndPosition.top + inputSizeAndPosition.height + mu;
+            widgetDOM.style.left = inputSizeAndPosition.left + mu;
+            widgetDOM.style.display = "block";
         }
 
         function clickPanel(e){}
 
         function clickClose(e){
+
+            var t = e.target;
             
-            DOMstack.forEach(function(input){input.removeAttribute("data-is-colorpicker-opened");})
-            panel.style.display = "none";
+            inputStackDOM.forEach(function(input){input.removeAttribute("data-is-colorpicker-opened");});
+            panelStackDOM.forEach(function(panel){panel.style.display = "none";});
         }
 
-        return input;
+        return {inputStackDOM: inputStackDOM, panelStackDOM: panelStackDOM};
     }
 
     return colorPicker;
