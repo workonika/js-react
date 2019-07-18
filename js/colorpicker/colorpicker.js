@@ -269,11 +269,15 @@ var colorPicker = (function(){
 
             var t = e.target;
 
-            var some = inputStackDOM.some(function(input){
+            var isClickInInput = inputStackDOM.some(function(input){
                 return input === t;
             });
 
-            if(!some){
+            var isInputOpen = inputStackDOM.some(function(input){
+                return input.hasAttribute("data-is-colorpicker-opened");
+            });
+
+            if(!isClickInInput && isInputOpen){
 
                 var stack = traversalDOMUp(t, []);
 
