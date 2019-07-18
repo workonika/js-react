@@ -50,11 +50,63 @@ var colorPicker = (function(){
         };
         //Соответствие доступных форматов цветов способу получения цвета
         var matchFormatToMethod = {
-            //rgb, hex, rgba, webnames
-            square: [{match: true, order: 2}, {match: true, order: 1}, {match: false, order: 0}, {match: true, order: 0}],
-            circle: [{match: true, order: 2}, {match: true, order: 1}, {match: false, order: 0}, {match: false, order: 0}],
-            slider: [{match: true, order: 2}, {match: true, order: 1}, {match: true, order: 0}, {match: false, order: 0}],
-            dropper: [{match: true, order: 2}, {match: true, order: 1}, {match: false, order: 0}, {match: false, order: 0}]
+            //Сначала с меньшим индексом
+            square: [ 
+                {
+                    name: "rgb", match: true, order: 2
+                }, 
+                {
+                    name: "hex", match: true, order: 1
+                }, 
+                {
+                    name: "rgba", match: false, order: 0
+                }, 
+                {
+                    name: "webnames", match: true, order: 0
+                }
+            ],
+            circle: [ 
+                {
+                    name: "rgb", match: true, order: 2
+                }, 
+                {
+                    name: "hex", match: true, order: 1
+                }, 
+                {
+                    name: "rgba", match: false, order: 0
+                }, 
+                {
+                    name: "webnames", match: false, order: 0
+                }
+            ],
+            slider: [ 
+                {
+                    name: "rgb", match: true, order: 2
+                }, 
+                {
+                    name: "hex", match: true, order: 1
+                }, 
+                {
+                    name: "rgba", match: true, order: 0
+                }, 
+                {
+                    name: "webnames", match: false, order: 0
+                }
+            ],
+            dropper: [ 
+                {
+                    name: "rgb", match: true, order: 2
+                }, 
+                {
+                    name: "hex", match: true, order: 1
+                }, 
+                {
+                    name: "rgba", match: false, order: 0
+                }, 
+                {
+                    name: "webnames", match: false, order: 0
+                }
+            ],
         };
 
         //Получаем стэк полей input к которым прикрепляется виджет
@@ -82,20 +134,22 @@ var colorPicker = (function(){
             if(position === "static"){
                 input.style.position = "relative";
             }
-
         });
 
+        var cssClassesForControl = ["way-of-getting-color", "color-formats", "content-of-way"];
+
         var paramsOfcreateWidgetDOMElement = {
-            widgetSize: {width: 200, height: 200},
+            widgetSize: { width: 200, height: 200 },
             wayOfGettingColor: wayOfGettingColor, 
             colorFormats: colorFormats, 
             matchFormatToMethod: matchFormatToMethod, 
-            lang: lang
+            lang: lang,
+            cssClassesForControl: cssClassesForControl
         };
 
-        var widgetDOM = createWidgetDOMElement(paramsOfcreateWidgetDOMElement); //Задаются размеры виджета то есть окошка colorPicker
-        document.body.appendChild(widgetDOM); //Помещаем colorPicker в DOM-дерево
-        bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition);
+        var widgetDOM = createWidgetDOMElement(paramsOfcreateWidgetDOMElement);
+        document.body.appendChild(widgetDOM); 
+        bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition, cssClassesForControl);
 
     //конец функции colorPicker
     }
@@ -116,17 +170,46 @@ var colorPicker = (function(){
     }
 
     function createWidgetDOMElement(params){
-        var p = params; 
         
-        var div = document.createElement("div"),
+        var p = params, 
+            div = document.createElement("div"),
             mu = "px";
-            div.style.position = "absolute";
-            div.style.width = panelSize.width + mu;
-            div.style.height = panelSize.height + mu;
-            div.style.border = "2px solid red";
-            div.style.display = "none";
 
-            div.innerHTML = "<div class='close'>x</div>";
+        div.style.position = "absolute";
+        div.style.width = p.widgetSize.width + mu;
+        div.style.height = p.widgetSize.height + mu;
+        div.style.border = "2px solid red";
+        div.style.display = "none";
+
+        var innerHTML = { innerHTML: "<div class='close'>x</div>", },
+            waysOfGettingColorKeys = Object.keys(p.wayOfGettingColor[p.lang]),
+            cssClassesForControl = p.cssClassesForControl;
+
+            waysOfGettingColorKeys.sort(function(a,b){
+                return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
+            });
+
+        waysOfGettingColorKeys.forEach(function(wayName){
+            
+            this.innerHTML += "<div class='" + cssClassesForControl[0] + "' title='" + p.wayOfGettingColor[p.lang][wayName].name
+            + "'>" + p.wayOfGettingColor[p.lang][wayName].name + "</div>";
+
+            var matchFormat = p.matchFormatToMethod[wayName]
+                .filter(function(format){ return format.match})
+                .sort(function(a,b){return a.order-b.order});
+
+            this.innerHTML += "<div class='" + cssClassesForControl[1] + " " + wayName + "'>"
+            
+            matchFormat.forEach(function(format){
+                this.innerHTML += "<div class='" + format.name + "' title='" + format.name + "'>" 
+                + format.name + "</div>";
+            }, this);
+
+            this.innerHTML += "</div><div class='" + cssClassesForControl[2] + " " + wayName + "'>" + wayName + "</div>";
+
+        }, innerHTML);
+
+        div.innerHTML = innerHTML.innerHTML;
 
         return div;
     }
@@ -139,16 +222,20 @@ var colorPicker = (function(){
 
         var close = widgetDOM.querySelector(".close");
         close.addEventListener("click", clickClose, false);
+
+        document.addEventListener("click", clickOutOfWidget, false);
         
         function clickInput(e){
-            var t = e.target,
-                inputSizeAndPosition = getInputSizeAndPosition(t), 
-                mu = "px";
+            var t = e.target;
             
             if(t.getAttribute("data-is-colorpicker-opened") === "true")
                 return false;
 
-            widgetDOM.style.display = "none";
+            var 
+                inputSizeAndPosition = getInputSizeAndPosition(t), 
+                mu = "px"
+
+            hideWidget();
 
             inputStackDOM.forEach(function(input){
                 input.removeAttribute("data-is-colorpicker-opened");
@@ -158,20 +245,62 @@ var colorPicker = (function(){
 
             widgetDOM.style.top = inputSizeAndPosition.top + inputSizeAndPosition.height + mu;
             widgetDOM.style.left = inputSizeAndPosition.left + mu;
-            widgetDOM.style.display = "block";
+            displayWidget();
         }
 
-        function clickPanel(e){}
+        function clickWidget(e){}
 
         function clickClose(e){
 
             var t = e.target;
-            
-            inputStackDOM.forEach(function(input){input.removeAttribute("data-is-colorpicker-opened");});
-            panelStackDOM.forEach(function(panel){panel.style.display = "none";});
+            hideWidget();
         }
 
-        return {inputStackDOM: inputStackDOM, panelStackDOM: panelStackDOM};
+        function hideWidget(){
+            widgetDOM.style.display = "none";
+            inputStackDOM.forEach(function(input){input.removeAttribute("data-is-colorpicker-opened");});
+        }
+
+        function displayWidget(){
+            widgetDOM.style.display = "block";
+        }
+
+        function clickOutOfWidget(e){
+
+            var t = e.target;
+
+            var some = inputStackDOM.some(function(input){
+                return input === t;
+            });
+
+            if(!some){
+
+                var stack = traversalDOMUp(t, []);
+
+                var filteredStack = stack.filter(function(DOMElement){ return DOMElement === widgetDOM});
+
+                if(!filteredStack.length)
+                    hideWidget();
+            }
+
+            function traversalDOMUp(DOMElement, stack){
+            
+                if(DOMElement === widgetDOM){
+                    stack.push(DOMElement);
+                    return stack;
+                }
+                
+                if(!DOMElement)
+                    return stack;
+    
+                DOMElement = DOMElement.parentNode;
+    
+                return traversalDOMUp(DOMElement, stack);
+            }
+    
+        }
+
+        return {inputStackDOM: inputStackDOM, widgetDOM: widgetDOM};
     }
 
     return colorPicker;
