@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = "colors-names.csv";
 
-var request = require('request');
+var request = require('request'); //https://www.npmjs.com/package/request
+//Модуль - огонь!!!
 
 var URL = 'https://ru.wikipedia.org/wiki/%D0%A6%D0%B2%D0%B5%D1%82%D0%B0_HTML';
 
