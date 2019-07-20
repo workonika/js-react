@@ -1,6 +1,16 @@
 const fs = require('fs');
 const path = "colors-names.csv";
 
+var request = require('request');
+
+var URL = 'https://ru.wikipedia.org/wiki/%D0%A6%D0%B2%D0%B5%D1%82%D0%B0_HTML';
+
+request(URL, function (err, res, body) {
+    if (err) throw err;
+    console.log(body);
+    console.log(res.statusCode);
+});
+
 //Задача: на выходе получить следующую структуру данных
 /*
     {
@@ -17,7 +27,7 @@ const path = "colors-names.csv";
     Группировка цветов и сами цвета взяты: https://ru.wikipedia.org/wiki/%D0%A6%D0%B2%D0%B5%D1%82%D0%B0_HTML 
 */
 const rgb = ["r", "g", "b"];
-
+/*
 fs.readFile(path, "utf-8", function(error, data){
     if(error)
         console.error("error:", error.message);
@@ -29,10 +39,9 @@ fs.readFile(path, "utf-8", function(error, data){
         splitStream.forEach(function(str){
             
             var split = str.split(",");
-            //console.log("split", split, "length", split.length);
-
+            
             if(split[3] !== ""){
-                //console.log("here--------------------------------------")
+                
                 if("temp" in this){
                     delete this.temp;
                 }
@@ -40,8 +49,6 @@ fs.readFile(path, "utf-8", function(error, data){
             }
 
             this.temp[split[0]] = {};
-
-            //console.log(this);
 
             if(split[2].match(/\s/) === null)
                 splitStr(split[2]).forEach((channel, idx)=>{
@@ -58,7 +65,7 @@ fs.readFile(path, "utf-8", function(error, data){
         console.log(colorsMap);
     }
 });
-
+*/
 function splitStr(str, num = 3){
 
     const splitted = str.split("");
