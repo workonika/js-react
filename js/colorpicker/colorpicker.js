@@ -109,6 +109,10 @@ var colorPicker = (function(){
             ],
         };
 
+        var colorNames = {
+            
+        };
+
         //Получаем стэк полей input к которым прикрепляется виджет
         var inputStackDOM = [].slice.call(document.querySelectorAll(typeof params === "string" ? params : params.selector));
         if(!inputStackDOM.length){
