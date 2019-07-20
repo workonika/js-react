@@ -2,14 +2,23 @@ const fs = require('fs');
 const path = "colors-names.csv";
 
 var request = require('request'); //https://www.npmjs.com/package/request
-//Модуль - огонь!!!
+var cheerio = require('cheerio'); //https://www.npmjs.com/package/cheerio
+//Модули - огонь!!!
 
 var URL = 'https://ru.wikipedia.org/wiki/%D0%A6%D0%B2%D0%B5%D1%82%D0%B0_HTML';
 
 request(URL, function (err, res, body) {
     if (err) throw err;
-    console.log(body);
+    const $ = cheerio.load(body);
+
+    //console.log($("table[cellpadding='4']").html());
     console.log(res.statusCode);
+
+    var table = $("table[cellpadding='4'] tr td");
+    //:not(tr:first-child)
+    //console.log(table);
+    //table.each(function(){console.log("this", this.name, this.children[0].data)});
+    table.each(function(){console.log("this", this)});
 });
 
 //Задача: на выходе получить следующую структуру данных
