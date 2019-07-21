@@ -139,7 +139,7 @@ var colorPicker = (function(){
         });
 
         var cssClassesForControl = ["way-of-getting-color", "color-formats", "content-of-way"],
-            waysOfGettingColorKeys = Object.keys(p.wayOfGettingColor[p.lang]);
+            waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]);
 
         var paramsOfcreateWidgetDOMElement = {
             widgetSize: { width: 200, height: 200 },
