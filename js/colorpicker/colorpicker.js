@@ -146,7 +146,8 @@ var colorPicker = (function(){
             colorFormats: colorFormats, 
             matchFormatToMethod: matchFormatToMethod, 
             lang: lang,
-            cssClassesForControl: cssClassesForControl
+            cssClassesForControl: cssClassesForControl,
+            startWayName: "square"
         };
 
         var widgetDOM = createWidgetDOMElement(paramsOfcreateWidgetDOMElement);
@@ -187,27 +188,50 @@ var colorPicker = (function(){
             waysOfGettingColorKeys = Object.keys(p.wayOfGettingColor[p.lang]),
             cssClassesForControl = p.cssClassesForControl;
 
-            waysOfGettingColorKeys.sort(function(a,b){
-                return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
-            });
+        var display = function(wayName){
+            return wayName === p.startWayName ? "block" : "none";
+        };
 
-        waysOfGettingColorKeys.forEach(function(wayName){
-            //cssClassesForControl = ["way-of-getting-color", "color-formats", "content-of-way"]
-            this.innerHTML += "<div class='" + cssClassesForControl[0] + "' title='" + p.wayOfGettingColor[p.lang][wayName].name
-            + "' data-way-name='" + wayName + "'>" + p.wayOfGettingColor[p.lang][wayName].name + "</div>";
+        var border = function(wayName){
+            return wayName === p.startWayName ? "1px solid black" : "none";
+        }
+    
+        waysOfGettingColorKeys.sort(function(a,b){
+            return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
+        });
 
-            var matchFormat = p.matchFormatToMethod[wayName]
-                .filter(function(format){ return format.match})
-                .sort(function(a,b){return a.order-b.order});
-
-            this.innerHTML += "<div class='" + cssClassesForControl[1] + " " + wayName + "'>"
+        cssClassesForControl.forEach(function(cssClass){
             
-            matchFormat.forEach(function(format){
-                this.innerHTML += "<div class='" + format.name + "' title='" + format.name + "'>" 
-                + format.name + "</div>";
-            }, this);
+            this.innerHTML += "<div class='" + cssClass + "'>" + 
+                
+                waysOfGettingColorKeys.reduce({
+                    "way-of-getting-color" : function(curr, next){
+                        return curr + "<div class='" + next + "' title='" 
+                            + p.wayOfGettingColor[p.lang][next].name + "' style='border:" + border(next) + "'>"
+                            + p.wayOfGettingColor[p.lang][next].name + "</div>";
+                    },
+                    "color-formats" : function(curr, next){
+                        var matchFormat = p.matchFormatToMethod[next]
+                            .filter(function(format){ return format.match})
+                            .sort(function(a,b){return a.order-b.order});
 
-            this.innerHTML += "</div><div class='" + cssClassesForControl[2] + " " + wayName + "'>" + wayName + "</div>";
+                        var str = curr + "<div class='" + next + "' title='" 
+                            + p.wayOfGettingColor[p.lang][next].name + "' style='display:" + display(next) + "'>";
+
+                        matchFormat.forEach(function(format){
+                            str += "<div class='" + format.name + "' title='" + format.name + "'>" 
+                            + format.name + "</div>";
+                        });
+
+                        return str + "</div>";
+                    },
+                    "content-of-way" : function(curr, next){
+                        return curr + "</div><div class='" + next + "' style='display:" + display(next) + "'>" + next + "</div>";
+                    }
+
+                }[cssClass], "")
+                
+                + "</div>";
 
         }, innerHTML);
 
@@ -216,7 +240,7 @@ var colorPicker = (function(){
         return div;
     }
 
-    function bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition){
+    function bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition, cssClassesForControl){
         
         inputStackDOM.forEach(function(input){ 
             input.addEventListener("click", clickInput, false); 
@@ -251,7 +275,9 @@ var colorPicker = (function(){
             displayWidget();
         }
         //Клик на colorpicker
-        function clickWidget(e){}
+        function clickWidget(e){
+
+        }
         //Клик на 
         function clickClose(e){
 
@@ -260,7 +286,7 @@ var colorPicker = (function(){
         }
         //Проверка, где сделан клик и если вне colorpicker, то закрывается colorpicker
         function clickOutOfWidget(e){
-            console.log("clickOutOfWidget");
+            
             var t = e.target;
 
             var isClickInInput = inputStackDOM.some(function(input){
