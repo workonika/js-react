@@ -138,7 +138,8 @@ var colorPicker = (function(){
             }
         });
 
-        var cssClassesForControl = ["way-of-getting-color", "color-formats", "content-of-way"];
+        var cssClassesForControl = ["way-of-getting-color", "color-formats", "content-of-way"],
+            waysOfGettingColorKeys = Object.keys(p.wayOfGettingColor[p.lang]);
 
         var paramsOfcreateWidgetDOMElement = {
             widgetSize: { width: 200, height: 200 },
@@ -147,12 +148,23 @@ var colorPicker = (function(){
             matchFormatToMethod: matchFormatToMethod, 
             lang: lang,
             cssClassesForControl: cssClassesForControl,
+            waysOfGettingColorKeys: waysOfGettingColorKeys,
             startWayName: "square"
         };
 
         var widgetDOM = createWidgetDOMElement(paramsOfcreateWidgetDOMElement);
-        document.body.appendChild(widgetDOM); 
-        bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition, cssClassesForControl);
+        document.body.appendChild(widgetDOM);
+
+        var paramsOfBindEventListeners = {
+            widgetDOM: widgetDOM,
+            inputStackDOM: inputStackDOM,
+            getInputSizeAndPosition: getInputSizeAndPosition,
+            cssClassesForControl: cssClassesForControl,
+            colorNames: colorNames, 
+            waysOfGettingColorKeys: waysOfGettingColorKeys
+        };
+
+        bindEventListeners(paramsOfBindEventListeners);
 
     //конец функции colorPicker
     }
@@ -185,7 +197,7 @@ var colorPicker = (function(){
         div.style.display = "none";
 
         var innerHTML = { innerHTML: "<div class='close'>x</div>", },
-            waysOfGettingColorKeys = Object.keys(p.wayOfGettingColor[p.lang]),
+            waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             cssClassesForControl = p.cssClassesForControl;
 
         var display = function(wayName){
@@ -240,8 +252,16 @@ var colorPicker = (function(){
         return div;
     }
 
-    function bindEventListeners(widgetDOM, inputStackDOM, getInputSizeAndPosition, cssClassesForControl){
-        
+    function bindEventListeners(params){
+
+        var p = params, 
+            widgetDOM = p.widgetDOM,
+            inputStackDOM = p.inputStackDOM,
+            getInputSizeAndPosition = p.getInputSizeAndPosition,
+            cssClassesForControl = p.cssClassesForControl,
+            colorNames = p.colorNames, 
+            waysOfGettingColorKeys = p.waysOfGettingColorKeys;
+
         inputStackDOM.forEach(function(input){ 
             input.addEventListener("click", clickInput, false); 
         });
@@ -250,6 +270,16 @@ var colorPicker = (function(){
         close.addEventListener("click", clickClose, false);
 
         widgetDOM.addEventListener("click", clickWidget, false);
+
+        var ways = getDOMElements(cssClassesForControl[0]),
+            formats = getDOMElements(cssClassesForControl[1]),
+            content = getDOMElements(cssClassesForControl[2]);
+
+        console.log(ways, formats, content);
+
+        function getDOMElements(cssClass){
+            return [].slice.call(widgetDOM.querySelectorAll("." + cssClass));
+        }
 
         //Клик на input type=text
         function clickInput(e){
@@ -278,7 +308,7 @@ var colorPicker = (function(){
         function clickWidget(e){
 
         }
-        //Клик на 
+        //Клик на элементе close
         function clickClose(e){
 
             var t = e.target;
