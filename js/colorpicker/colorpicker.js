@@ -214,6 +214,35 @@ var colorPicker = (function(){
         var border = function(isTrue){
             return isTrue ? "1px solid black" : "none";
         }
+
+        var widgetAreaMap = {
+            "way-of-getting-color" : function(curr, next){
+                return curr + "<div class='" + next + "' title='" 
+                    + p.wayOfGettingColor[p.lang][next].name + "' style='border:" + border(next === p.startWayName) + "'>"
+                    + p.wayOfGettingColor[p.lang][next].name + "</div>";
+            },
+            "color-formats" : function(curr, next){
+                var matchFormat = matchFormatToMethod[next]
+                    .filter(function(format){ return format.match})
+                    .sort(function(a,b){return a.order-b.order});
+
+                var _display = display(next === p.startWayName);
+
+                var str = curr + "<div class='" + next + "' title='" 
+                    + p.wayOfGettingColor[p.lang][next].name + "' style='display:" + _display + "'>";
+
+                matchFormat.forEach(function(format){
+                    str += "<div class='" + format.name + "' title='" + format.name + "' style='border:" 
+                    + border(_display === "block" && format.name === p.startColorFormat) + "'>" 
+                    + format.name + "</div>";
+                });
+
+                return str + "</div>";
+            },
+            "content-of-way" : function(curr, next){
+                return curr + "<div class='" + next + "' style='display:" + display(next === p.startWayName) + "'>" + next + "</div>";
+            }
+        };
     
         waysOfGettingColorKeys.sort(function(a,b){
             return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
@@ -223,35 +252,7 @@ var colorPicker = (function(){
             
             this.innerHTML += "<div class='" + cssClass + "'>" + 
                 
-                waysOfGettingColorKeys.reduce({
-                    "way-of-getting-color" : function(curr, next){
-                        return curr + "<div class='" + next + "' title='" 
-                            + p.wayOfGettingColor[p.lang][next].name + "' style='border:" + border(next === p.startWayName) + "'>"
-                            + p.wayOfGettingColor[p.lang][next].name + "</div>";
-                    },
-                    "color-formats" : function(curr, next){
-                        var matchFormat = matchFormatToMethod[next]
-                            .filter(function(format){ return format.match})
-                            .sort(function(a,b){return a.order-b.order});
-
-                        var _display = display(next === p.startWayName);
-
-                        var str = curr + "<div class='" + next + "' title='" 
-                            + p.wayOfGettingColor[p.lang][next].name + "' style='display:" + _display + "'>";
-
-                        matchFormat.forEach(function(format){
-                            str += "<div class='" + format.name + "' title='" + format.name + "' style='border:" 
-                            + border(_display === "block" && format.name === p.startColorFormat) + "'>" 
-                            + format.name + "</div>";
-                        });
-
-                        return str + "</div>";
-                    },
-                    "content-of-way" : function(curr, next){
-                        return curr + "<div class='" + next + "' style='display:" + display(next === p.startWayName) + "'>" + next + "</div>";
-                    }
-
-                }[cssClass], "")
+                waysOfGettingColorKeys.reduce(widgetAreaMap[cssClass], "")
                 
                 + "</div>";
 
@@ -286,8 +287,6 @@ var colorPicker = (function(){
         var ways = getByWay(cssClassesForControl[0]),
             formats = getByFormat(cssClassesForControl[1]),
             content = getByWay(cssClassesForControl[2]);
-
-        console.log(ways, formats, content);
 
         function getByWay(cssClass){
             var _widgetDOM = widgetDOM.querySelector("." + cssClass);
@@ -334,7 +333,34 @@ var colorPicker = (function(){
         }
         //Клик на colorpicker
         function clickWidget(e){
+            var t = e.target,
+                stack = traversalDOMUp(t, widgetDOM, []),
+                fns = {
+                    0 : switchWay,
+                    1 : chooseFormat,
+                    2 : getValue
+                };
 
+            stack.forEach(function(elem){
+                cssClassesForControl.forEach(function(cssClass){
+                    if(elem.getAttribute("class") === cssClass){
+                        fns[cssClassesForControl.indexOf(cssClass)](stack, t);
+                    }
+                });
+            });
+            
+            function switchWay(stack, target){
+                //if(target.classList.contains){}
+                console.log(stack, target);
+            }
+
+            function chooseFormat(stack, target){
+                console.log(stack, target);
+            }
+
+            function getValue(stack, target){
+                console.log(stack, target);
+            }
         }
         //Клик на элементе close
         function clickClose(e){
@@ -357,29 +383,13 @@ var colorPicker = (function(){
 
             if(!isClickInInput && isInputOpen){
 
-                var stack = traversalDOMUp(t, []);
+                var stack = traversalDOMUp(t, widgetDOM, []);
 
                 var filteredStack = stack.filter(function(DOMElement){ return DOMElement === widgetDOM});
 
                 if(!filteredStack.length)
                     hideWidget();
             }
-
-            function traversalDOMUp(DOMElement, stack){
-            
-                if(DOMElement === widgetDOM){
-                    stack.push(DOMElement);
-                    return stack;
-                }
-                
-                if(!DOMElement)
-                    return stack;
-    
-                DOMElement = DOMElement.parentNode;
-    
-                return traversalDOMUp(DOMElement, stack);
-            }
-    
         }
 
         function hideWidget(){
@@ -391,6 +401,22 @@ var colorPicker = (function(){
         function displayWidget(){
             document.addEventListener("click", clickOutOfWidget, false);
             widgetDOM.style.display = "block";
+        }
+
+        function traversalDOMUp(DOMElement, targetElement, stack){
+            
+            stack.push(DOMElement);
+
+            if(DOMElement === targetElement){
+                return stack;
+            }
+           
+            DOMElement = DOMElement.parentNode;
+
+            if(!DOMElement)
+                return stack;
+
+            return traversalDOMUp(DOMElement, targetElement, stack);
         }
 
         return {inputStackDOM: inputStackDOM, widgetDOM: widgetDOM};
