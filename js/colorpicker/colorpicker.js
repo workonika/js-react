@@ -175,6 +175,14 @@ var colorPicker = (function(){
     //конец функции colorPicker
     }
 
+    var display = function(isTrue){
+        return isTrue ? "block" : "none";
+    };
+
+    var border = function(isTrue){
+        return isTrue ? "1px solid black" : "none";
+    };
+
     //Получить размеры DOM-элемента, а также абсолютную позицию top, left
     //определенного как параметр и конечно переданного в качестве аргумента при вызове ф-ии
     function getInputSizeAndPosition(input){
@@ -207,14 +215,13 @@ var colorPicker = (function(){
             cssClassesForControl = p.cssClassesForControl,
             matchFormatToMethod = p.matchFormatToMethod;
 
-        var display = function(isTrue){
-            return isTrue ? "block" : "none";
+        var contentMap = {
+            square: buildSquare.bind({colors: p.colorNames, size: {width: 20, height: 20}}),
+            circle: buildCircle,
+            slider: buildSlider,
+            dropper: buildDropper
         };
-
-        var border = function(isTrue){
-            return isTrue ? "1px solid black" : "none";
-        }
-
+        
         var widgetAreaMap = {
             "way-of-getting-color" : function(curr, next){
                 return curr + "<div class='" + next + "' title='" 
@@ -240,17 +247,17 @@ var colorPicker = (function(){
                 return str + "</div>";
             },
             "content-of-way" : function(curr, next){
-                return curr + "<div class='" + next + "' style='display:" + display(next === p.startWayName) + "'>" + next + "</div>";
+                return curr + "<div class='" + next + "' style='display:" + display(next === p.startWayName) + "'>" + contentMap[next]() + "</div>";
             }
         };
-    
+
         waysOfGettingColorKeys.sort(function(a,b){
             return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
         });
 
         cssClassesForControl.forEach(function(cssClass){
             
-            this.innerHTML += "<div class='" + cssClass + "'>" + 
+            this.innerHTML += "<div class='" + cssClass + "'>" +
                 
                 waysOfGettingColorKeys.reduce(widgetAreaMap[cssClass], "")
                 
@@ -263,9 +270,28 @@ var colorPicker = (function(){
         return div;
     }
 
+    function buildSquare(){
+        var div = document.createElement("div"),
+            innerHTML = "";
+
+        this.colors.forEach(function(colorGroup){
+            innerHTML += "<div>" + colorGroup.groupName + "</div>";
+            colorGroup.colors.forEach(function(color){
+                innerHTML += "<div style='width:" + this.size.width + "px; height:" + this.size.height + "px; background:" 
+                    + color.name + "; display: inline-block;' data-value='" + color.name + "'></div>";
+            }, this);
+        }, this);
+
+        return div.innerHTML = innerHTML;
+    }
+
+    function buildCircle(){return "buildCircle";}
+    function buildSlider(){return "buildSlider";}
+    function buildDropper(){return "buildDropper";}
+
     function bindEventListeners(params){
 
-        var p = params, 
+        var p = params,
             widgetDOM = p.widgetDOM,
             inputStackDOM = p.inputStackDOM,
             getInputSizeAndPosition = p.getInputSizeAndPosition,
@@ -273,9 +299,11 @@ var colorPicker = (function(){
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             colorFormatsKeys = p.colorFormatsKeys,
             startWayName = p.startWayName,
-            startColorFormat = p.startColorFormat;
+            startColorFormat = p.startColorFormat,
+            startValue = "",
+            currentInput = undefined;
 
-        inputStackDOM.forEach(function(input){ 
+        inputStackDOM.forEach(function(input){
             input.addEventListener("click", clickInput, false); 
         });
 
@@ -284,22 +312,34 @@ var colorPicker = (function(){
 
         widgetDOM.addEventListener("click", clickWidget, false);
 
-        var ways = getByWay(cssClassesForControl[0]),
-            formats = getByFormat(cssClassesForControl[1]),
-            content = getByWay(cssClassesForControl[2]);
+        var elemsByWay, 
+            squareDOMList, 
+            circleDOMList,
+            sliderDOMList, 
+           dropperDOMList; 
 
-        function getByWay(cssClass){
+        elemsByWay = [squareDOMList, circleDOMList, sliderDOMList, dropperDOMList];
+
+        elemsByWay = waysOfGettingColorKeys.map(function(cssClass){
+            return [].slice.call(widgetDOM.querySelectorAll("." + cssClass));
+        });
+
+        var ways = getNestedElems(cssClassesForControl[0]),
+            formats = getDeepNestedElems(cssClassesForControl[1]),
+            content = getNestedElems(cssClassesForControl[2]);
+
+        function getNestedElems(cssClass){
             var _widgetDOM = widgetDOM.querySelector("." + cssClass);
             return [].concat.apply([], waysOfGettingColorKeys.map(function(key){
                 return [].slice.call(_widgetDOM.querySelectorAll("." + key));
             }));
         }
 
-        function getByFormat(cssClass){
+        function getDeepNestedElems(cssClass){
             
-            var byWays = getByWay(cssClass);
+            var nestedElems = getNestedElems(cssClass);
 
-            return byWays.map(function(parentNode){
+            return nestedElems.map(function(parentNode){
                 var elementsByFormat = colorFormatsKeys
                     .map(function(key){return parentNode.querySelector("." + key)})
                     .filter(function(node){return !!node});
@@ -310,7 +350,7 @@ var colorPicker = (function(){
 
         //Клик на input type=text
         function clickInput(e){
-            var t = e.target;
+            var t = currentInput = e.target;
             
             if(t.getAttribute("data-is-colorpicker-opened") === "true")
                 return false;
@@ -344,22 +384,59 @@ var colorPicker = (function(){
             stack.forEach(function(elem){
                 cssClassesForControl.forEach(function(cssClass){
                     if(elem.getAttribute("class") === cssClass){
-                        fns[cssClassesForControl.indexOf(cssClass)](stack, t);
+                        fns[cssClassesForControl.indexOf(cssClass)](t);
                     }
                 });
             });
             
-            function switchWay(stack, target){
-                //if(target.classList.contains){}
-                console.log(stack, target);
+            function switchWay(target){
+                
+                startWayName = target.getAttribute("class");
+                var index = waysOfGettingColorKeys.indexOf(startWayName);
+
+                elemsByWay.forEach(function(elemsGroup, idx){
+                    elemsGroup.forEach(function(elem, ndx){
+                        if(ndx !== 0)
+                            elem.style.display = display(idx === index);
+                        else
+                            elem.style.border = border(idx === index);
+                    });
+                });
+
+                chooseFormat();
             }
 
-            function chooseFormat(stack, target){
-                console.log(stack, target);
+            function chooseFormat(target){
+                
+                var index = waysOfGettingColorKeys.indexOf(startWayName);
+
+                formats[index].forEach(function(format){
+                    format.style.border = border(false);
+                    if(!target){
+                        format.style.border = border(format.getAttribute("class") === startColorFormat);
+                    }
+                });
+
+                if(target){
+                    startColorFormat = target.getAttribute("class");
+                    target.style.border = border(true);
+                }
             }
 
-            function getValue(stack, target){
-                console.log(stack, target);
+            function getValue(target){
+                
+                startValue = target.getAttribute("data-value");
+                currentInput.value = startValue;
+
+                //cssClassesForControl = p.cssClassesForControl,
+                //waysOfGettingColorKeys = p.waysOfGettingColorKeys,
+                //colorFormatsKeys = p.colorFormatsKeys,
+                //startWayName = p.startWayName,
+                //startColorFormat = p.startColorFormat,
+                //startValue = "",
+                //currentInput 
+
+                hideWidget();
             }
         }
         //Клик на элементе close
