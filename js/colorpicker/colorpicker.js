@@ -145,7 +145,7 @@ var colorPicker = (function(){
             startColorFormat = "hex";
 
         var paramsOfcreateWidgetDOMElement = {
-            widgetSize: { width: 200, height: 200 },
+            widgetSize: { width: 350, height: 300 },
             wayOfGettingColor: wayOfGettingColor, 
             matchFormatToMethod: matchFormatToMethod, 
             lang: lang,
@@ -275,7 +275,7 @@ var colorPicker = (function(){
             innerHTML = "";
 
         this.colors.forEach(function(colorGroup){
-            innerHTML += "<div>" + colorGroup.groupName + "</div>";
+            //innerHTML += "<div>" + colorGroup.groupName + "</div>";
             colorGroup.colors.forEach(function(color){
                 innerHTML += "<div style='width:" + this.size.width + "px; height:" + this.size.height + "px; background:" 
                     + color.name + "; display: inline-block;' data-value='" + color.name + "'></div>";
@@ -312,21 +312,26 @@ var colorPicker = (function(){
 
         widgetDOM.addEventListener("click", clickWidget, false);
 
-        var elemsByWay, 
+        var oneWayDifferrentAreas, 
             squareDOMList, 
             circleDOMList,
             sliderDOMList, 
            dropperDOMList; 
 
-        elemsByWay = [squareDOMList, circleDOMList, sliderDOMList, dropperDOMList];
+        oneWayDifferrentAreas = [squareDOMList, circleDOMList, sliderDOMList, dropperDOMList];
 
-        elemsByWay = waysOfGettingColorKeys.map(function(cssClass){
+        oneWayDifferrentAreas = waysOfGettingColorKeys.map(function(cssClass){
             return [].slice.call(widgetDOM.querySelectorAll("." + cssClass));
         });
 
+        //oneAreaDifferentWays
+        //Нет никакого смысла запихивать в массив, так как formats уже является двумерным массивом
         var ways = getNestedElems(cssClassesForControl[0]),
             formats = getDeepNestedElems(cssClassesForControl[1]),
             content = getNestedElems(cssClassesForControl[2]);
+
+        //console.log("oneAreaDifferentWays:", ways, formats, content);
+        //console.log("oneWayDifferrentAreas:", oneWayDifferrentAreas);
 
         function getNestedElems(cssClass){
             var _widgetDOM = widgetDOM.querySelector("." + cssClass);
@@ -384,17 +389,29 @@ var colorPicker = (function(){
             stack.forEach(function(elem){
                 cssClassesForControl.forEach(function(cssClass){
                     if(elem.getAttribute("class") === cssClass){
-                        fns[cssClassesForControl.indexOf(cssClass)](t);
+                        stack.pop();
+                        fns[cssClassesForControl.indexOf(cssClass)](stack, t);
                     }
                 });
             });
             
-            function switchWay(target){
+            function switchWay(stack){
                 
-                startWayName = target.getAttribute("class");
-                var index = waysOfGettingColorKeys.indexOf(startWayName);
-
-                elemsByWay.forEach(function(elemsGroup, idx){
+                var index = -1; 
+                
+                stack.forEach(function(DOMElem){
+                    waysOfGettingColorKeys.forEach(function(cssClass, idx){
+                        
+                        var cssClassOfElement = DOMElem.getAttribute("class");
+                        
+                        if(cssClassOfElement === cssClass){
+                            index = idx; 
+                            startWayName = cssClass;
+                        }
+                    });
+                })
+              
+                oneWayDifferrentAreas.forEach(function(elemsGroup, idx){
                     elemsGroup.forEach(function(elem, ndx){
                         if(ndx !== 0)
                             elem.style.display = display(idx === index);
@@ -406,8 +423,8 @@ var colorPicker = (function(){
                 chooseFormat();
             }
 
-            function chooseFormat(target){
-                
+            function chooseFormat(stack, target){
+                console.log("stack:", stack);
                 var index = waysOfGettingColorKeys.indexOf(startWayName);
 
                 formats[index].forEach(function(format){
@@ -423,8 +440,8 @@ var colorPicker = (function(){
                 }
             }
 
-            function getValue(target){
-                
+            function getValue(stack, target){
+                console.log("stack:", stack);
                 startValue = target.getAttribute("data-value");
                 currentInput.value = startValue;
 
