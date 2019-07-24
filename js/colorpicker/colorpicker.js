@@ -404,8 +404,8 @@ var colorPicker = (function(){
                         
                         var cssClassOfElement = DOMElem.getAttribute("class");
                         
-                        if(cssClassOfElement === cssClass){
-                            index = idx; 
+                        if(cssClassOfElement.indexOf(cssClass) !== -1){
+                            index = idx;
                             startWayName = cssClass;
                         }
                     });
