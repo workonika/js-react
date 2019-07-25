@@ -300,6 +300,7 @@ var colorPicker = (function(){
             colorFormatsKeys = p.colorFormatsKeys,
             startWayName = p.startWayName,
             startColorFormat = p.startColorFormat,
+            commonColorFormatByDefault = "", //Нужно ли это?
             startValue = "",
             currentInput = undefined;
 
@@ -326,9 +327,9 @@ var colorPicker = (function(){
 
         //oneAreaDifferentWays
         //Нет никакого смысла запихивать в массив, так как formats уже является двумерным массивом
-        var ways = getNestedElems(cssClassesForControl[0]),
-            formats = getDeepNestedElems(cssClassesForControl[1]),
-            content = getNestedElems(cssClassesForControl[2]);
+        var waysDOM = getNestedElems(cssClassesForControl[0]),
+            formatsDOM = getDeepNestedElems(cssClassesForControl[1]),
+            contentDOM = getNestedElems(cssClassesForControl[2]);
 
         //console.log("oneAreaDifferentWays:", ways, formats, content);
         //console.log("oneWayDifferrentAreas:", oneWayDifferrentAreas);
@@ -404,7 +405,7 @@ var colorPicker = (function(){
                         
                         var cssClassOfElement = DOMElem.getAttribute("class");
                         
-                        if(cssClassOfElement.indexOf(cssClass) !== -1){
+                        if(cssClassOfElement && cssClassOfElement.indexOf(cssClass) !== -1){
                             index = idx;
                             startWayName = cssClass;
                         }
@@ -420,30 +421,71 @@ var colorPicker = (function(){
                     });
                 });
 
-                chooseFormat();
+                chooseFormat(stack);
             }
 
-            function chooseFormat(stack, target){
-                console.log("stack:", stack);
+            function chooseFormat(stack){
+                
                 var index = waysOfGettingColorKeys.indexOf(startWayName);
-
-                formats[index].forEach(function(format){
-                    format.style.border = border(false);
-                    if(!target){
-                        format.style.border = border(format.getAttribute("class") === startColorFormat);
-                    }
+                
+                var isAnyFormatDOMElemInStack = false,
+                    isAnyFormatDOMElemEqualToStartColor = false;
+                
+                formatsDOM[index].forEach(function(formatDOMElem){
+                   
+                    formatDOMElem.style.border = border(false);
+                    
+                    stack.forEach(function(stackDOMElem){
+                        
+                        if(formatDOMElem === stackDOMElem){
+                            formatDOMElem.style.border = border(true);
+                            isAnyFormatDOMElemInStack = true;
+                            startColorFormat = formatDOMElem.getAttribute("class");
+                        }
+                    });
                 });
 
-                if(target){
-                    startColorFormat = target.getAttribute("class");
-                    target.style.border = border(true);
-                }
+                if(!isAnyFormatDOMElemInStack){
+                    
+                    isAnyFormatDOMElemEqualToStartColor = formatsDOM[index].some(function(formatDOMElem){
+                        
+                        var cssClass = formatDOMElem.getAttribute("class"),
+                            isEqual = cssClass.indexOf(startColorFormat) !== -1;
+
+                        if(isEqual){
+                            startColorFormat = cssClass;
+                            formatDOMElem.style.border = border(true);
+                        }
+
+                        return isEqual;
+                    });
+                    
+                    if(!isAnyFormatDOMElemEqualToStartColor){
+                        
+                        colorFormatsKeys.forEach(function(colorFormat){
+                            formatsDOM[index].forEach(function(DOMElem){
+                                if(DOMElem.getAttribute("class").indexOf(colorFormat) !== -1){
+                                    if(!isAnyFormatDOMElemEqualToStartColor){
+                                        //Эта проверка может показаться излишней, но в массиве colorFormatsKeys
+                                        //совпадения со значениями атрибута class в DOM-элементах может быть более одного
+                                        
+                                        //Также, для большего контроля можно использовать переменную со значением
+                                        //того формат, который назначается по умолчанию в случае отсутствия у способа
+                                        DOMElem.style.border = border(true);
+                                        startColorFormat = colorFormat;
+                                        isAnyFormatDOMElemEqualToStartColor = true;
+                                    }
+                                }
+                            });
+                        });
+                    }
+                } 
             }
 
-            function getValue(stack, target){
+            function getValue(stack){
                 console.log("stack:", stack);
-                startValue = target.getAttribute("data-value");
-                currentInput.value = startValue;
+                
+                //currentInput.value = startValue;
 
                 //cssClassesForControl = p.cssClassesForControl,
                 //waysOfGettingColorKeys = p.waysOfGettingColorKeys,
