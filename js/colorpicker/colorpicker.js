@@ -10,11 +10,11 @@ var colorPicker = (function(){
         var wayOfGettingColor = {
             ru: {
                 square: {
-                    name: "Квадраты с web именами",
+                    name: "Web имена",
                     order: 0
                 },
                 circle: {
-                    name: "Цветовой круг",
+                    name: "Выбор",
                     order: 1
                 },
                 slider: {
@@ -175,8 +175,8 @@ var colorPicker = (function(){
     //конец функции colorPicker
     }
 
-    var display = function(isTrue){
-        return isTrue ? "block" : "none";
+    var display = function(isTrue, displayAs){
+        return isTrue ? (displayAs || "block") : "none";
     };
 
     var border = function(isTrue){
@@ -207,10 +207,15 @@ var colorPicker = (function(){
         div.style.position = "absolute";
         div.style.width = p.widgetSize.width + mu;
         div.style.height = p.widgetSize.height + mu;
-        div.style.border = "2px solid red";
+        div.style.border = "1px solid #aaabaa";
         div.style.display = "none";
+        div.style.fontFamily = "sans-serif";
+        div.style.fontSize = ".8em";
+        div.style.marginTop = "2px";
+        div.style.padding = "5px";
+        div.style.color = "#4e4d4d";
 
-        var innerHTML = { innerHTML: "<div class='close'>x</div>", },
+        var innerHTML = { innerHTML: "<div style='position: absolute; width: 20px; height: 20px; right: 0; rotate: 45deg; font-size: 1.4em' class='close'>&times;</div>", },
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             cssClassesForControl = p.cssClassesForControl,
             matchFormatToMethod = p.matchFormatToMethod;
@@ -225,7 +230,8 @@ var colorPicker = (function(){
         var widgetAreaMap = {
             "way-of-getting-color" : function(curr, next){
                 return curr + "<div class='" + next + "' title='" 
-                    + p.wayOfGettingColor[p.lang][next].name + "' style='border:" + border(next === p.startWayName) + "'>"
+                    + p.wayOfGettingColor[p.lang][next].name + "' style='display: inline-block; margin-right: 15px; border:" 
+                    + border(next === p.startWayName) + "'>"
                     + p.wayOfGettingColor[p.lang][next].name + "</div>";
             },
             "color-formats" : function(curr, next){
@@ -240,7 +246,8 @@ var colorPicker = (function(){
 
                 matchFormat.forEach(function(format){
                     str += "<div class='" + format.name + "' title='" + format.name + "' style='border:" 
-                    + border(_display === "block" && format.name === p.startColorFormat) + "'>" 
+                    + border(_display === "block" && format.name === p.startColorFormat) 
+                    + "; display: inline-block; margin-right: 15px;'>"
                     + format.name + "</div>";
                 });
 
@@ -257,7 +264,7 @@ var colorPicker = (function(){
 
         cssClassesForControl.forEach(function(cssClass){
             
-            this.innerHTML += "<div class='" + cssClass + "'>" +
+            this.innerHTML += "<div class='" + cssClass + "' style='margin-top: 20px;'>" +
                 
                 waysOfGettingColorKeys.reduce(widgetAreaMap[cssClass], "")
                 
@@ -276,6 +283,7 @@ var colorPicker = (function(){
 
         this.colors.forEach(function(colorGroup){
             //innerHTML += "<div>" + colorGroup.groupName + "</div>";
+            //При необходимости можно выводить имена групп цветов - тогда нужно расскомментировать предыдущую строку
             colorGroup.colors.forEach(function(color){
                 innerHTML += "<div style='width:" + this.size.width + "px; height:" + this.size.height + "px; background:" 
                     + color.name + "; display: inline-block;' data-value='" + color.name + "'></div>";
@@ -285,7 +293,25 @@ var colorPicker = (function(){
         return div.innerHTML = innerHTML;
     }
 
-    function buildCircle(){return "buildCircle";}
+    function buildCircle(){
+        var div = document.createElement("div"),
+            innerHTML = "",
+            background = "#ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000";
+            //Меняться будет цвет только у верхнего div
+            innerHTML += 
+                "<div style='position: relative; background: #ff0000; width: 100%; height: 110px; margin-bottom: 15px;'>"
+                    + "<div style='position: absolute; top: 0; left: 0; border-radius:100%; width: 6px; height: 6px; border: 4px solid white;'></div>"
+                    + "<div style='position: absolute; width: 100%; height: 100%; background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);'></div>"
+                    + "<div style='position: absolute; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 0%, #000 100%);'></div>"
+                + "</div>"
+                + "<div style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent'>"
+                    + "<div style='position: absolute; width: 15px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
+                    + "<div style='margin-top:4px; background:linear-gradient(to right," + background + "); width: 100%; height: 20px;'></div>";
+                + "</div>";
+
+        return div.innerHTML = innerHTML;
+    }
+
     function buildSlider(){return "buildSlider";}
     function buildDropper(){return "buildDropper";}
 
@@ -379,8 +405,8 @@ var colorPicker = (function(){
         }
         //Клик на colorpicker
         function clickWidget(e){
-            var t = e.target,
-                stack = traversalDOMUp(t, widgetDOM, []),
+            var 
+                stack = traversalDOMUp(e.target, widgetDOM, []),
                 fns = {
                     0 : switchWay,
                     1 : chooseFormat,
@@ -391,7 +417,7 @@ var colorPicker = (function(){
                 cssClassesForControl.forEach(function(cssClass){
                     if(elem.getAttribute("class") === cssClass){
                         stack.pop();
-                        fns[cssClassesForControl.indexOf(cssClass)](stack, t);
+                        fns[cssClassesForControl.indexOf(cssClass)](stack);
                     }
                 });
             });
