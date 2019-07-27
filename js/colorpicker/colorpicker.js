@@ -121,7 +121,13 @@ var colorPicker = (function(){
             }
         });
 
-        var cssClassesForControl = ["way-of-getting-color", "color-formats", "content-of-way"],
+        var cssClassesForControl = {
+                area: ["way-of-getting-color", "color-formats", "content-of-way"],
+                square: ["webnames", "rgb"],
+                rect: ["rectangle-chooser-color", "rectangle-color", "pointer-color", "spectr-color", 
+                        "slider-color", "choosed-color", "button-choose-result-color"],
+                slider: []
+            },
             waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
             startWayName = "square",
             startColorFormat = "hex";
@@ -205,8 +211,8 @@ var colorPicker = (function(){
             colorFormats = p.colorFormats;
 
         var contentMap = {
-            square: buildSquare.bind({colors: p.colorNames, size: {width: 20, height: 20}}),
-            rect: buildRect,
+            square: buildSquare.bind({cssClasses: cssClassesForControl.square, colors: p.colorNames, size: {width: 20, height: 20}}),
+            rect: buildRect.bind({cssClasses: cssClassesForControl.rect}),
             slider: buildSlider,
         };
         
@@ -245,7 +251,7 @@ var colorPicker = (function(){
             return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
         });
 
-        cssClassesForControl.forEach(function(cssClass){
+        cssClassesForControl.area.forEach(function(cssClass){
             
             this.innerHTML += "<div class='" + cssClass + "' style='margin-top: 20px;'>" +
                 
@@ -261,8 +267,7 @@ var colorPicker = (function(){
     }
 
     function buildSquare(){
-        var div = document.createElement("div"),
-            innerHTML = "";
+        var innerHTML = "";
 
         this.colors.forEach(function(colorGroup){
             //innerHTML += "<div>" + colorGroup.groupName + "</div>";
@@ -271,42 +276,46 @@ var colorPicker = (function(){
                 innerHTML += "<div style='width:" + this.size.width + "px; height:" 
                     + this.size.height + "px; background:" 
                     + color.name + "; display: inline-block;' data-value='" + color.name 
-                    + "' title='" + color.name + " rgb(" + color.dec.r + ", " + color.dec.g + ", " + color.dec.b + ")'></div>";
+                    + "' title='" + color.name + " rgb(" + color.dec.r + ", " + color.dec.g + ", " + color.dec.b + ")'"
+                    + "' data-r='" + color.dec.r + "' data-g='" + color.dec.g + "' data-b='" + color.dec.b + "'>"
+                    + "</div>";
             }, this);
         }, this);
 
-        return div.innerHTML = innerHTML;
+        return innerHTML;
     }
 
     function buildRect(){
-        var div = document.createElement("div"),
-            innerHTML = "",
+        var innerHTML = "",
             gradientColors = "#ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000";
+
             //Меняться будет цвет только у верхнего div
-            innerHTML += 
-                "<div class='' style='position: relative; background: #ff0000; width: 100%; height: 110px; margin-bottom: 15px;'>"
-                    + "<div style='position: absolute; z-index: 4; top: 0; left: 0; \
-                    border-radius:100%; width: 6px; height: 6px; border: 4px solid white;'></div>"
-                    + "<div style='position: absolute; width: 100%; height: 100%; \
-                    background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);'></div>"
-                    + "<div style='position: absolute; width: 100%; height: 100%; \
-                    background: linear-gradient(to bottom, transparent 0%, #000 100%);'></div>"
-                + "</div>"
-                + "<div style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent'>"
-                    + "<div style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
-                    + "<div style='margin-top:4px; background:linear-gradient(to right," 
-                    + gradientColors + "); width: 100%; height: 20px;'></div>"
-                + "</div>"
-                + "<div style='border-top:1px solid transparent; margin-top: 5px;'>"
-                    + "<div style='display: inline-block; vertical-align: top; margin: 12px 10px 0 0;'>Результат:</div>"
-                    + "<div class='choosing-result' style='display:inline-block; width: 40px; \
-                    height: 40px; border-radius: 100%; border: 1px solid black'></div>"
-                    + "<button class='' style='display: inline-block;\
-                        vertical-align: top; margin: 4px 0 0 44px; background-color: inherit;\
-                        border: 1px solid rgb(170, 171, 170); color: rgb(88, 90, 88); padding: 8px;'>Выбрать этот цвет</button>"
+            innerHTML +=
+                "<div class='" + this.cssClasses[0] + "'>"
+                    + "<div class='" + this.cssClasses[1] + "' style='position: relative; background: #ff0000; width: 100%; height: 110px; margin-bottom: 15px;'>"
+                        + "<div class='" + this.cssClasses[2] + "' style='position: absolute; z-index: 4; top: 0; left: 0; \
+                        border-radius:100%; width: 6px; height: 6px; border: 4px solid white;'></div>"
+                        + "<div style='position: absolute; width: 100%; height: 100%; \
+                        background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);'></div>"
+                        + "<div style='position: absolute; width: 100%; height: 100%; \
+                        background: linear-gradient(to bottom, transparent 0%, #000 100%);'></div>"
+                    + "</div>"
+                    + "<div class='" + this.cssClasses[3] + "' style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent'>"
+                        + "<div class='" + this.cssClasses[4] + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
+                        + "<div style='margin-top:4px; background:linear-gradient(to right," 
+                        + gradientColors + "); width: 100%; height: 20px;'></div>"
+                    + "</div>"
+                    + "<div style='border-top:1px solid transparent; margin-top: 5px;'>"
+                        + "<div style='display: inline-block; vertical-align: top; margin: 12px 10px 0 0;'>Результат:</div>"
+                        + "<div class='" + this.cssClasses[5] + "' style='display:inline-block; width: 40px; \
+                        height: 40px; border-radius: 100%; border: 1px solid black'></div>"
+                        + "<button class='" + this.cssClasses[6] + "' style='display: inline-block;\
+                            vertical-align: top; margin: 4px 0 0 44px; background-color: inherit;\
+                            border: 1px solid rgb(170, 171, 170); color: rgb(88, 90, 88); padding: 8px;'>Выбрать этот цвет</button>"
+                    + "</div>"
                 + "</div>";
 
-        return div.innerHTML = innerHTML;
+        return innerHTML;
     }
 
     function buildSlider(){return "buildSlider";}
@@ -326,15 +335,6 @@ var colorPicker = (function(){
             startValue = "",
             currentInput = undefined;
 
-        inputStackDOM.forEach(function(input){
-            input.addEventListener("click", clickInput, false); 
-        });
-
-        var close = widgetDOM.querySelector(".close");
-        close.addEventListener("click", clickClose, false);
-
-        widgetDOM.addEventListener("click", clickWidget, false);
-
         var oneWayDifferrentAreas, 
             squareDOMList, 
             rectDOMList,
@@ -348,12 +348,50 @@ var colorPicker = (function(){
 
         //oneAreaDifferentWays
         //Нет никакого смысла запихивать в массив, так как formats уже является двумерным массивом
-        var waysDOM = getNestedElems(cssClassesForControl[0]),
-            formatsDOM = getDeepNestedElems(cssClassesForControl[1]),
-            contentDOM = getNestedElems(cssClassesForControl[2]);
+        var waysDOM = getNestedElems(cssClassesForControl.area[0]),
+            formatsDOM = getDeepNestedElems(cssClassesForControl.area[1]),
+            contentDOM = getNestedElems(cssClassesForControl.area[2]);
+
+        var contentAreaEventsHandles = [squareFn, rectFn, sliderFn];
+
+        var stackOfElemsForMousemoveEvent = [
+                { 
+                    cssClass: cssClassesForControl.rect[2], 
+                    y: true 
+                },
+                { 
+                    cssClass: cssClassesForControl.rect[4], 
+                    y: false 
+                }
+            ].map(function(obj){
+                return { DOM: widgetDOM.querySelector("." + obj.cssClass), y: obj.y };
+            });
+
+        
+        var currentMousemoveElem,
+            y = false;
 
         //console.log("oneAreaDifferentWays:", ways, formats, content);
         //console.log("oneWayDifferrentAreas:", oneWayDifferrentAreas);
+
+        inputStackDOM.forEach(function(input){
+            input.addEventListener("click", clickInput, false); 
+        });
+
+        var close = widgetDOM.querySelector(".close");
+        close.addEventListener("click", clickClose, false);
+
+        ["click", "mousedown", "mouseup"].forEach(function(eventType){
+            widgetDOM.addEventListener(eventType, widgetEventsHandler, false);
+        });
+
+        // stackOfElemsForMousemoveEvent.forEach(function(DOMElem){
+        //     DOMElem.addEventListener("mousemove", mousemoveHandler, false);
+        // });
+
+        // contentDOM.forEach(function(DOMElem, idx){
+        //     DOMElem.addEventListener("mousemove", contentAreaEventsHandles[idx], false);
+        // });
 
         function getNestedElems(cssClass){
             var _widgetDOM = widgetDOM.querySelector("." + cssClass);
@@ -372,6 +410,16 @@ var colorPicker = (function(){
                     .filter(function(node){return !!node});
                 
                 return elementsByFormat;
+            });
+        }
+
+        function matchingElements(arr1, arr2, callback){
+            arr1.forEach(function(arr1DOMElem, ndx){
+                arr2.forEach(function(arr2DOMElem, idx){
+                    if(arr1DOMElem === arr2DOMElem){
+                        callback({ match: arr1DOMElem, arrs: [{arr: arr1, idx: ndx}, {arr: arr2, idx: idx}] });
+                    }
+                });
             });
         }
 
@@ -398,9 +446,10 @@ var colorPicker = (function(){
             widgetDOM.style.left = inputSizeAndPosition.left + mu;
             displayWidget();
         }
-        //Клик на colorpicker
-        function clickWidget(e){
+        //События на colorpicker
+        function widgetEventsHandler(e){
             var 
+                type = e.type,
                 stack = traversalDOMUp(e.target, widgetDOM, []),
                 fns = {
                     0 : switchWay,
@@ -409,120 +458,205 @@ var colorPicker = (function(){
                 };
 
             stack.forEach(function(elem){
-                cssClassesForControl.forEach(function(cssClass){
+                cssClassesForControl.area.forEach(function(cssClass){
                     if(elem.getAttribute("class") === cssClass){
                         stack.pop();
-                        fns[cssClassesForControl.indexOf(cssClass)](stack);
+                        fns[cssClassesForControl.area.indexOf(cssClass)](stack, type);
                     }
                 });
             });
+        }
+
+        function switchWay(stack){
+                
+            var index = -1; 
             
-            function switchWay(stack){
-                
-                var index = -1; 
-                
-                stack.forEach(function(DOMElem){
-                    waysOfGettingColorKeys.forEach(function(cssClass, idx){
-                        
-                        var cssClassOfElement = DOMElem.getAttribute("class");
-                        
-                        if(cssClassOfElement && cssClassOfElement.indexOf(cssClass) !== -1){
-                            index = idx;
-                            startWayName = cssClass;
-                        }
-                    });
-                })
-              
-                oneWayDifferrentAreas.forEach(function(elemsGroup, idx){
-                    elemsGroup.forEach(function(elem, ndx){
-                        if(ndx !== 0)
-                            elem.style.display = display(idx === index);
-                        else
-                            elem.style.border = border(idx === index);
-                    });
-                });
-
-                chooseFormat(stack);
-            }
-
-            function chooseFormat(stack){
-                
-                var index = waysOfGettingColorKeys.indexOf(startWayName);
-                
-                var isAnyFormatDOMElemInStack = false,
-                    isAnyFormatDOMElemEqualToStartColor = false;
-                
-                formatsDOM[index].forEach(function(formatDOMElem){
-                   
-                    formatDOMElem.style.border = border(false);
+            stack.forEach(function(DOMElem){
+                waysOfGettingColorKeys.forEach(function(cssClass, idx){
                     
-                    stack.forEach(function(stackDOMElem){
-                        
-                        if(formatDOMElem === stackDOMElem){
-                            formatDOMElem.style.border = border(true);
-                            isAnyFormatDOMElemInStack = true;
-                            startColorFormat = formatDOMElem.getAttribute("class");
-                        }
-                    });
-                });
-
-                if(!isAnyFormatDOMElemInStack){
+                    var cssClassOfElement = DOMElem.getAttribute("class");
                     
-                    isAnyFormatDOMElemEqualToStartColor = formatsDOM[index].some(function(formatDOMElem){
-                        
-                        var cssClass = formatDOMElem.getAttribute("class"),
-                            isEqual = cssClass.indexOf(startColorFormat) !== -1;
-
-                        if(isEqual){
-                            startColorFormat = cssClass;
-                            formatDOMElem.style.border = border(true);
-                        }
-
-                        return isEqual;
-                    });
-                    
-                    if(!isAnyFormatDOMElemEqualToStartColor){
-                        
-                        colorFormatsKeys.forEach(function(colorFormat){
-                            formatsDOM[index].forEach(function(DOMElem){
-                                if(DOMElem.getAttribute("class").indexOf(colorFormat) !== -1){
-                                    if(!isAnyFormatDOMElemEqualToStartColor){
-                                        //Эта проверка может показаться излишней, но в массиве colorFormatsKeys
-                                        //совпадения со значениями атрибута class в DOM-элементах может быть более одного
-                                        
-                                        //Также, для большего контроля можно использовать переменную со значением
-                                        //того формат, который назначается по умолчанию в случае отсутствия у способа
-                                        DOMElem.style.border = border(true);
-                                        startColorFormat = colorFormat;
-                                        isAnyFormatDOMElemEqualToStartColor = true;
-                                    }
-                                }
-                            });
-                        });
+                    if(cssClassOfElement && cssClassOfElement.indexOf(cssClass) !== -1){
+                        index = idx;
+                        startWayName = cssClass;
                     }
-                } 
-            }
+                });
+            })
+          
+            oneWayDifferrentAreas.forEach(function(elemsGroup, idx){
+                elemsGroup.forEach(function(elem, ndx){
+                    if(ndx !== 0)
+                        elem.style.display = display(idx === index);
+                    else
+                        elem.style.border = border(idx === index);
+                });
+            });
 
-            function getValue(stack){
-                console.log("stack:", stack);
+            chooseFormat(stack);
+        }
+
+        function chooseFormat(stack){
+            
+            var index = waysOfGettingColorKeys.indexOf(startWayName);
+            
+            var isAnyFormatDOMElemInStack = false,
+                isAnyFormatDOMElemEqualToStartColor = false;
+            
+            formatsDOM[index].forEach(function(formatDOMElem){
+               
+                formatDOMElem.style.border = border(false);
                 
-                //currentInput.value = startValue;
+                stack.forEach(function(stackDOMElem){
+                    
+                    if(formatDOMElem === stackDOMElem){
+                        formatDOMElem.style.border = border(true);
+                        isAnyFormatDOMElemInStack = true;
+                        startColorFormat = formatDOMElem.getAttribute("class");
+                    }
+                });
+            });
 
-                //cssClassesForControl = p.cssClassesForControl,
-                //waysOfGettingColorKeys = p.waysOfGettingColorKeys,
-                //colorFormatsKeys = p.colorFormatsKeys,
-                //startWayName = p.startWayName,
-                //startColorFormat = p.startColorFormat,
-                //startValue = "",
-                //currentInput 
+            if(!isAnyFormatDOMElemInStack){
+                
+                isAnyFormatDOMElemEqualToStartColor = formatsDOM[index].some(function(formatDOMElem){
+                    
+                    var cssClass = formatDOMElem.getAttribute("class"),
+                        isEqual = cssClass.indexOf(startColorFormat) !== -1;
 
-                hideWidget();
+                    if(isEqual){
+                        startColorFormat = cssClass;
+                        formatDOMElem.style.border = border(true);
+                    }
+
+                    return isEqual;
+                });
+                
+                if(!isAnyFormatDOMElemEqualToStartColor){
+                    
+                    colorFormatsKeys.forEach(function(colorFormat){
+                        formatsDOM[index].forEach(function(DOMElem){
+                            if(DOMElem.getAttribute("class").indexOf(colorFormat) !== -1){
+                                if(!isAnyFormatDOMElemEqualToStartColor){
+                                    //Эта проверка может показаться излишней, но в массиве colorFormatsKeys
+                                    //совпадения со значениями атрибута class в DOM-элементах может быть более одного
+                                    
+                                    //Также, для большего контроля можно использовать переменную со значением
+                                    //того формат, который назначается по умолчанию в случае отсутствия у способа
+                                    DOMElem.style.border = border(true);
+                                    startColorFormat = colorFormat;
+                                    isAnyFormatDOMElemEqualToStartColor = true;
+                                }
+                            }
+                        });
+                    });
+                }
+            } 
+        }
+
+        function getValue(stack, eventType){
+            
+        console.log("stackOfElemsForMousemoveEvent", stackOfElemsForMousemoveEvent);
+
+            //currentInput.value = startValue;
+            
+            switch(eventType){
+                case "mousedown": mousedown(stack); break;
+                case "mouseup"  : mouseup(stack); break;
+                default: click(stack);
             }
         }
-        //Клик на элементе close
-        function clickClose(e){
 
-            var t = e.target;
+        function mousedown(stack){
+
+            // matchingElements(stack, stackOfElemsForMousemoveEvent, function(){
+            //     var arg = [].slice.call(arguments)[0];
+            //     currentMousemoveElem = arg.match;
+            // });
+
+            stack.forEach(function(arr1DOMElem, ndx){
+                stackOfElemsForMousemoveEvent.forEach(function(arr2DOMElem, idx){
+                    if(arr1DOMElem === arr2DOMElem.DOM){
+                        currentMousemoveElem = arr2DOMElem.DOM;
+                        y = arr2DOMElem.y;
+                        console.log("currentMousemoveElem", currentMousemoveElem, "y:", y);
+                    }
+                });
+            });
+
+            if(currentMousemoveElem){
+                stack[stack.length - 2].onmousemove = mousemove;
+                stack[stack.length - 2].ondragstart = function(){return false;}
+            }
+        }
+
+        function mouseup(stack){
+            
+            if(currentMousemoveElem){ 
+                stack[stack.length - 2].onmousemove = undefined;
+                stack[stack.length - 2].ondragstart = undefined;
+                currentMousemoveElem = undefined;
+                y = false;
+            }
+        }
+
+        function mousemove(e){
+           
+            var t = currentMousemoveElem,
+                parent = t.parentNode,
+                geom = parent.getBoundingClientRect(),
+                coordTop = geom.top + pageYOffset,
+                coordLeft = geom.left + pageXOffset;
+
+            console.log(coordTop, coordLeft);
+
+            var shiftX = e.pageX - coordLeft;
+            var shiftY = e.pageY - coordTop;
+
+                
+    //ball.style.top = e.pageY - ball.offsetHeight / 2 + 'px';
+
+            if(y){
+                t.style.top = e.pageY;
+            }
+
+            var deltaX = ((e.pageX - geom.left) >= parent.clientWidth ? parent.clientWidth : e.pageX - geom.left) + "px";
+            console.log("e.pageX ", e.pageX , "deltaX", deltaX, "shiftX", shiftX, "coordLeft", coordLeft);
+            t.style.left = deltaX;
+            
+        }
+
+        function click(stack){
+            
+            matchingElements(stack, contentDOM, function(){
+                var arg = [].slice.call(arguments)[0];
+                contentAreaEventsHandles[arg.arrs[1].idx](stack);
+            });
+        }
+
+        
+        //Функции вызываемые на событие клик в области content
+        function squareFn(stack){
+            console.log(this, stack);
+                          
+            //waysOfGettingColorKeys = p.waysOfGettingColorKeys,
+            //colorFormatsKeys = p.colorFormatsKeys,
+            //startWayName = p.startWayName,
+            //startColorFormat = p.startColorFormat,
+            //startValue = "",
+            //currentInput 
+
+            //hideWidget();
+        }
+
+        function rectFn(e){
+            console.log(this, e);
+        }
+
+        function sliderFn(e){
+            console.log(this, e);
+        }
+        //Клик на элементе close
+        function clickClose(){
             hideWidget();
         }
         //Проверка, где сделан клик и если вне colorpicker, то закрывается colorpicker
