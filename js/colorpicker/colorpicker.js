@@ -296,17 +296,29 @@ var colorPicker = (function(){
     function buildCircle(){
         var div = document.createElement("div"),
             innerHTML = "",
-            background = "#ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000";
+            gradientColors = "#ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000";
             //Меняться будет цвет только у верхнего div
             innerHTML += 
-                "<div style='position: relative; background: #ff0000; width: 100%; height: 110px; margin-bottom: 15px;'>"
-                    + "<div style='position: absolute; top: 0; left: 0; border-radius:100%; width: 6px; height: 6px; border: 4px solid white;'></div>"
-                    + "<div style='position: absolute; width: 100%; height: 100%; background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);'></div>"
-                    + "<div style='position: absolute; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 0%, #000 100%);'></div>"
+                "<div class='' style='position: relative; background: #ff0000; width: 100%; height: 110px; margin-bottom: 15px;'>"
+                    + "<div style='position: absolute; z-index: 4; top: 0; left: 0; \
+                    border-radius:100%; width: 6px; height: 6px; border: 4px solid white;'></div>"
+                    + "<div style='position: absolute; width: 100%; height: 100%; \
+                    background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);'></div>"
+                    + "<div style='position: absolute; width: 100%; height: 100%; \
+                    background: linear-gradient(to bottom, transparent 0%, #000 100%);'></div>"
                 + "</div>"
                 + "<div style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent'>"
-                    + "<div style='position: absolute; width: 15px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
-                    + "<div style='margin-top:4px; background:linear-gradient(to right," + background + "); width: 100%; height: 20px;'></div>";
+                    + "<div style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
+                    + "<div style='margin-top:4px; background:linear-gradient(to right," 
+                    + gradientColors + "); width: 100%; height: 20px;'></div>"
+                + "</div>"
+                + "<div style='border-top:1px solid transparent; margin-top: 5px;'>"
+                    + "<div style='display: inline-block; vertical-align: top; margin: 12px 10px 0 0;'>Результат:</div>"
+                    + "<div class='choosing-result' style='display:inline-block; width: 40px; \
+                    height: 40px; border-radius: 100%; border: 1px solid black'></div>"
+                    + "<button class='' style='display: inline-block;\
+                        vertical-align: top; margin: 4px 0 0 44px; background-color: inherit;\
+                        border: 1px solid rgb(170, 171, 170); color: rgb(88, 90, 88); padding: 8px;'>Выбрать этот цвет</button>"
                 + "</div>";
 
         return div.innerHTML = innerHTML;
