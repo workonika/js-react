@@ -10,11 +10,11 @@ var colorPicker = (function(){
         var wayOfGettingColor = {
             ru: {
                 square: {
-                    name: "Web имена",
+                    name: "Заготовленные цвета",
                     order: 0
                 },
                 rect: {
-                    name: "Выбор",
+                    name: "Спектр",
                     order: 1
                 },
                 slider: {
@@ -268,8 +268,10 @@ var colorPicker = (function(){
             //innerHTML += "<div>" + colorGroup.groupName + "</div>";
             //При необходимости можно выводить имена групп цветов - тогда нужно расскомментировать предыдущую строку
             colorGroup.colors.forEach(function(color){
-                innerHTML += "<div style='width:" + this.size.width + "px; height:" + this.size.height + "px; background:" 
-                    + color.name + "; display: inline-block;' data-value='" + color.name + "'></div>";
+                innerHTML += "<div style='width:" + this.size.width + "px; height:" 
+                    + this.size.height + "px; background:" 
+                    + color.name + "; display: inline-block;' data-value='" + color.name 
+                    + "' title='" + color.name + " rgb(" + color.dec.r + ", " + color.dec.g + ", " + color.dec.b + ")'></div>";
             }, this);
         }, this);
 
