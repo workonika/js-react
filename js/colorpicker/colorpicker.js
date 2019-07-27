@@ -39,7 +39,7 @@ var colorPicker = (function(){
                     order: 2
                 }, 
                 webnames: {
-                    name: "web имена",
+                    name: "html названия цветов",
                     order: 3
                 }
             }
@@ -131,6 +131,7 @@ var colorPicker = (function(){
             wayOfGettingColor: wayOfGettingColor, 
             matchFormatToMethod: matchFormatToMethod, 
             lang: lang,
+            colorFormats: colorFormats,
             cssClassesForControl: cssClassesForControl,
             waysOfGettingColorKeys: waysOfGettingColorKeys,
             startWayName: startWayName,
@@ -200,7 +201,8 @@ var colorPicker = (function(){
         var innerHTML = { innerHTML: "<div style='position: absolute; width: 20px; height: 20px; right: 0; rotate: 45deg; font-size: 1.4em' class='close'>&times;</div>", },
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             cssClassesForControl = p.cssClassesForControl,
-            matchFormatToMethod = p.matchFormatToMethod;
+            matchFormatToMethod = p.matchFormatToMethod,
+            colorFormats = p.colorFormats;
 
         var contentMap = {
             square: buildSquare.bind({colors: p.colorNames, size: {width: 20, height: 20}}),
@@ -226,10 +228,10 @@ var colorPicker = (function(){
                     + p.wayOfGettingColor[p.lang][next].name + "' style='display:" + _display + "'>";
 
                 matchFormat.forEach(function(format){
-                    str += "<div class='" + format.name + "' title='" + format.name + "' style='border:" 
+                    str += "<div class='" + format.name + "' title='" + colorFormats[p.lang][format.name].name + "' style='border:" 
                     + border(_display === "block" && format.name === p.startColorFormat) 
                     + "; display: inline-block; margin-right: 15px;'>"
-                    + format.name + "</div>";
+                    + colorFormats[p.lang][format.name].name + "</div>";
                 });
 
                 return str + "</div>";
