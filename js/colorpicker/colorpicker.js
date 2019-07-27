@@ -13,7 +13,7 @@ var colorPicker = (function(){
                     name: "Web имена",
                     order: 0
                 },
-                circle: {
+                rect: {
                     name: "Выбор",
                     order: 1
                 },
@@ -21,10 +21,6 @@ var colorPicker = (function(){
                     name: "Слайдер",
                     order: 2
                 },
-                dropper: {
-                    name: "Пипетка",
-                    order: 3
-                }
             }
         };
         //Форматы цветов
@@ -65,7 +61,7 @@ var colorPicker = (function(){
                     name: "webnames", match: true, order: 0
                 }
             ],
-            circle: [ 
+            rect: [ 
                 {
                     name: "rgb", match: true, order: 2
                 }, 
@@ -88,20 +84,6 @@ var colorPicker = (function(){
                 }, 
                 {
                     name: "rgba", match: true, order: 0
-                }, 
-                {
-                    name: "webnames", match: false, order: 0
-                }
-            ],
-            dropper: [ 
-                {
-                    name: "rgb", match: true, order: 2
-                }, 
-                {
-                    name: "hex", match: true, order: 1
-                }, 
-                {
-                    name: "rgba", match: false, order: 0
                 }, 
                 {
                     name: "webnames", match: false, order: 0
@@ -222,9 +204,8 @@ var colorPicker = (function(){
 
         var contentMap = {
             square: buildSquare.bind({colors: p.colorNames, size: {width: 20, height: 20}}),
-            circle: buildCircle,
+            rect: buildRect,
             slider: buildSlider,
-            dropper: buildDropper
         };
         
         var widgetAreaMap = {
@@ -293,7 +274,7 @@ var colorPicker = (function(){
         return div.innerHTML = innerHTML;
     }
 
-    function buildCircle(){
+    function buildRect(){
         var div = document.createElement("div"),
             innerHTML = "",
             gradientColors = "#ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000";
@@ -325,7 +306,6 @@ var colorPicker = (function(){
     }
 
     function buildSlider(){return "buildSlider";}
-    function buildDropper(){return "buildDropper";}
 
     function bindEventListeners(params){
 
@@ -353,11 +333,10 @@ var colorPicker = (function(){
 
         var oneWayDifferrentAreas, 
             squareDOMList, 
-            circleDOMList,
-            sliderDOMList, 
-           dropperDOMList; 
+            rectDOMList,
+            sliderDOMList; 
 
-        oneWayDifferrentAreas = [squareDOMList, circleDOMList, sliderDOMList, dropperDOMList];
+        oneWayDifferrentAreas = [squareDOMList, rectDOMList, sliderDOMList];
 
         oneWayDifferrentAreas = waysOfGettingColorKeys.map(function(cssClass){
             return [].slice.call(widgetDOM.querySelectorAll("." + cssClass));
