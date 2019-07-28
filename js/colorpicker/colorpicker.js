@@ -573,12 +573,11 @@ var colorPicker = (function(){
             //     currentMousemoveElem = arg.match;
             // });
 
-            stack.forEach(function(arr1DOMElem, ndx){
-                stackOfElemsForMousemoveEvent.forEach(function(arr2DOMElem, idx){
+            stack.forEach(function(arr1DOMElem){
+                stackOfElemsForMousemoveEvent.forEach(function(arr2DOMElem){
                     if(arr1DOMElem === arr2DOMElem.DOM){
                         currentMousemoveElem = arr2DOMElem.DOM;
                         y = arr2DOMElem.y;
-                        console.log("currentMousemoveElem", currentMousemoveElem, "y:", y);
                     }
                 });
             });
@@ -603,26 +602,23 @@ var colorPicker = (function(){
            
             var t = currentMousemoveElem,
                 parent = t.parentNode,
-                geom = parent.getBoundingClientRect(),
-                coordTop = geom.top + pageYOffset,
-                coordLeft = geom.left + pageXOffset;
+                geometryParent = parent.getBoundingClientRect(),
+                geometryTarget = t.getBoundingClientRect();
 
-            console.log(coordTop, coordLeft);
-
-            var shiftX = e.pageX - coordLeft;
-            var shiftY = e.pageY - coordTop;
-
-                
-    //ball.style.top = e.pageY - ball.offsetHeight / 2 + 'px';
-
-            if(y){
-                t.style.top = e.pageY;
-            }
-
-            var deltaX = ((e.pageX - geom.left) >= parent.clientWidth ? parent.clientWidth : e.pageX - geom.left) + "px";
-            console.log("e.pageX ", e.pageX , "deltaX", deltaX, "shiftX", shiftX, "coordLeft", coordLeft);
-            t.style.left = deltaX;
+            var deltaX = e.pageX - (pageXOffset + geometryParent.left);
             
+            var deltaY = e.pageY - (pageYOffset + geometryParent.top);
+
+            //console.log("e.pageY", e.pageY, "geometryParent.top", geometryParent.top, "parent.clientHeight", parent.clientHeight, "pageYOffset", pageYOffset);
+            //console.log("e.pageX", e.pageX, "geometryParent.left", geometryParent.left, "parent.clientWidth", parent.clientWidth, "pageXOffset", pageXOffset);
+            
+            if(y){
+                t.style.top = ((deltaY >= geometryParent.height - geometryTarget.height) ?
+                    geometryParent.height - geometryTarget.height : deltaY) + "px";
+            }
+            
+            t.style.left = ((deltaX >= geometryParent.width - geometryTarget.width) ? 
+                    geometryParent.width - geometryTarget.width : deltaX) + "px";
         }
 
         function click(stack){
