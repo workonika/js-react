@@ -213,7 +213,7 @@ var colorPicker = (function(){
         var contentMap = {
             square: buildSquare.bind({cssClasses: cssClassesForControl.square, colors: p.colorNames, size: {width: 20, height: 20}}),
             rect: buildRect.bind({cssClasses: cssClassesForControl.rect}),
-            slider: buildSlider,
+            slider: buildSlider.bind({cssClasses: cssClassesForControl.slider}),
         };
         
         var widgetAreaMap = {
@@ -305,20 +305,47 @@ var colorPicker = (function(){
                         + "<div style='margin-top:4px; background:linear-gradient(to right," 
                         + gradientColors + "); width: 100%; height: 20px;'></div>"
                     + "</div>"
-                    + "<div style='border-top:1px solid transparent; margin-top: 5px;'>"
-                        + "<div style='display: inline-block; vertical-align: top; margin: 12px 10px 0 0;'>Результат:</div>"
-                        + "<div class='" + this.cssClasses[5] + "' style='display:inline-block; width: 40px; \
-                        height: 40px; border-radius: 100%; border: 1px solid black'></div>"
-                        + "<button class='" + this.cssClasses[6] + "' style='display: inline-block;\
-                            vertical-align: top; margin: 4px 0 0 44px; background-color: inherit;\
-                            border: 1px solid rgb(170, 171, 170); color: rgb(88, 90, 88); padding: 8px;'>Выбрать этот цвет</button>"
-                    + "</div>"
+
+                    + createResult(this.cssClasses[5], this.cssClasses[6])
+                    
                 + "</div>";
 
         return innerHTML;
     }
 
-    function buildSlider(){return "buildSlider";}
+    function buildSlider(){
+        var innerHTML = "";
+
+            innerHTML += "<div style='display: inline-block; width: 80%;'>" + createSlide() + createSlide() + createSlide() + createSlide() + "</div>";
+            innerHTML += "<div style='display: inline-block; width: 18%;'>" + createInput() + createInput() + createInput() + createInput() + "</div>";
+            innerHTML += createResult("this.cssClasses[5]", "this.cssClasses[6]");
+
+        return innerHTML;
+    }
+
+    function createResult(first, second){
+        return "<div style='border-top:1px solid transparent; margin-top: 5px;'>"
+                + "<div style='display: inline-block; vertical-align: top; margin: 12px 10px 0 0;'>Результат:</div>"
+                + "<div class='" + first + "' style='display:inline-block; width: 40px; \
+                height: 40px; border-radius: 100%; border: 1px solid black'></div>"
+                + "<button class='" + second + "' style='display: inline-block;\
+                    vertical-align: top; margin: 4px 0 0 44px; background-color: inherit;\
+                    border: 1px solid rgb(170, 171, 170); color: rgb(88, 90, 88); padding: 8px;'>Выбрать этот цвет</button>"
+            + "</div>";
+    }
+
+    function createSlide(first, second){
+        return "<div class='" + first + "' style='position: relative; width: 98%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
+                + "<div class='" + second + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
+                + "<div style='margin-top:4px; width: 100%; height: 20px; box-sizing: border-box; border: 1px solid grey;'></div>"
+            + "</div>"
+    }
+
+    function createInput(first, second){
+        return "<div class='" + first + "' style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
+                + "<input class='" + second + "' style='position: absolute; width: 100%; height: 28px; border: 1px solid black; left: 0; top: 0' />"
+            + "</div>"
+    }
 
     function bindEventListeners(params){
 
