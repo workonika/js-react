@@ -1,4 +1,17 @@
 var colorPicker = (function(){
+    //mode: enum {dev, prod}
+    //adAs: enum {style, parasite, file}
+    var preprocessCss = cssMachine({mode: "dev", adAs: ""}, {});
+    /*
+    Идея cssMachine в следующем. 
+    Чтобы не городить множество встроенных стилей в js-файл необходимо разделить js, css. Это и так понятно. Но есть нюанс!
+    Задание имён классов в css-файле не гарантирует уникальность. Какие-то имена из имеющихся на странице, куда будет встраиваться
+    виджет colorpicker, могут совпадать и стили смешаются и придётся отлаживать. Либо просто придётся тратить время на придумывание
+    уникальных имён. Препроцессор позволяет использовать очень простые имена для классов на этапе разработки. А когда виджет 
+    используется в проде, то достаточно сменить режим и все имена классов будут преобразованы или в очень длинные уникальные имена,
+    либо в хэш-значение. 
+    */
+
     function colorPicker(params){
         if(typeof params === undefined || typeof params !== "string" && typeof params !== "object"){
             throw new Error("Параметр должен быть или объектом или строкой и не должен быть null");
@@ -146,7 +159,7 @@ var colorPicker = (function(){
         };
 
         var widgetDOM = createWidgetDOMElement(paramsOfcreateWidgetDOMElement);
-        document.body.appendChild(widgetDOM);
+        document.body.appendChild( preprocessCss(widgetDOM) );
 
         var paramsOfBindEventListeners = {
             widgetDOM: widgetDOM,
@@ -696,6 +709,12 @@ var colorPicker = (function(){
         }
 
         return {inputStackDOM: inputStackDOM, widgetDOM: widgetDOM};
+    }
+
+    function cssMachine(params, rules){
+        return function(DOMElem){
+            return DOMElem;
+        }
     }
 
     return colorPicker;
