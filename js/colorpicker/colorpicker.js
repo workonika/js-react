@@ -371,9 +371,6 @@ var colorPicker = (function(){
         var currentMousemoveElem,
             y = false;
 
-        //console.log("oneAreaDifferentWays:", ways, formats, content);
-        //console.log("oneWayDifferrentAreas:", oneWayDifferrentAreas);
-
         inputStackDOM.forEach(function(input){
             input.addEventListener("click", clickInput, false); 
         });
@@ -384,14 +381,6 @@ var colorPicker = (function(){
         ["click", "mousedown", "mouseup"].forEach(function(eventType){
             widgetDOM.addEventListener(eventType, widgetEventsHandler, false);
         });
-
-        // stackOfElemsForMousemoveEvent.forEach(function(DOMElem){
-        //     DOMElem.addEventListener("mousemove", mousemoveHandler, false);
-        // });
-
-        // contentDOM.forEach(function(DOMElem, idx){
-        //     DOMElem.addEventListener("mousemove", contentAreaEventsHandles[idx], false);
-        // });
 
         function getNestedElems(cssClass){
             var _widgetDOM = widgetDOM.querySelector("." + cssClass);
