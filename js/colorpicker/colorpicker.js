@@ -126,7 +126,7 @@ var colorPicker = (function(){
                 square: ["webnames", "rgb"],
                 rect: ["rectangle-chooser-color", "rectangle-color", "pointer-color", "spectr-color", 
                         "slider-color", "choosed-color", "button-choose-result-color"],
-                slider: []
+                slider: ["parent-red", "slide-red", "parent-green", "slide-green", "parent-blue", "slide-blue"]
             },
             waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
             startWayName = "square",
@@ -316,7 +316,12 @@ var colorPicker = (function(){
     function buildSlider(){
         var innerHTML = "";
 
-            innerHTML += "<div style='display: inline-block; width: 80%;'>" + createSlide() + createSlide() + createSlide() + createSlide() + "</div>";
+            innerHTML += "<div style='display: inline-block; width: 80%;'>" 
+                + createSlide(this.cssClasses[0], this.cssClasses[1], "#cc7070")
+                + createSlide(this.cssClasses[2], this.cssClasses[3], "#7ec77e")
+                + createSlide(this.cssClasses[4], this.cssClasses[5], "#5757a5")
+                + createSlide() + "</div>";
+
             innerHTML += "<div style='display: inline-block; width: 18%;'>" + createInput() + createInput() + createInput() + createInput() + "</div>";
             innerHTML += createResult("this.cssClasses[5]", "this.cssClasses[6]");
 
@@ -334,10 +339,10 @@ var colorPicker = (function(){
             + "</div>";
     }
 
-    function createSlide(first, second){
-        return "<div class='" + first + "' style='position: relative; width: 98%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
-                + "<div class='" + second + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
-                + "<div style='margin-top:4px; width: 100%; height: 20px; box-sizing: border-box; border: 1px solid grey;'></div>"
+    function createSlide(parent, slide, color){
+        return "<div class='" + parent + "' style='position: relative; width: 98%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
+                + "<div class='" + slide + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
+                + "<div style='margin-top:4px; width: 100%; height: 20px; box-sizing: border-box; border: 1px solid grey; background-color:" + color + ";'></div>"
             + "</div>"
     }
 
@@ -388,6 +393,18 @@ var colorPicker = (function(){
                 },
                 { 
                     cssClass: cssClassesForControl.rect[4], 
+                    y: false 
+                },
+                { 
+                    cssClass: cssClassesForControl.slider[1], 
+                    y: false 
+                },
+                { 
+                    cssClass: cssClassesForControl.slider[3], 
+                    y: false 
+                },
+                { 
+                    cssClass: cssClassesForControl.slider[5], 
                     y: false 
                 }
             ].map(function(obj){
