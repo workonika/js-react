@@ -126,7 +126,8 @@ var colorPicker = (function(){
                 square: ["webnames", "rgb"],
                 rect: ["rectangle-chooser-color", "rectangle-color", "pointer-color", "spectr-color", 
                         "slider-color", "choosed-color", "button-choose-result-color"],
-                slider: ["parent-red", "slide-red", "parent-green", "slide-green", "parent-blue", "slide-blue"]
+                slider: ["parent-red", "slide-red", "parent-green", "slide-green", "parent-blue", 
+                        "slide-blue", "slide-input", "r", "g", "b", "alpha"]
             },
             waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
             startWayName = "square",
@@ -156,7 +157,7 @@ var colorPicker = (function(){
             waysOfGettingColorKeys: waysOfGettingColorKeys,
             colorFormatsKeys: Object.keys(colorFormats[lang]),
             startWayName: startWayName,
-            startColorFormat: startColorFormat
+            startColorFormat: startColorFormat,
         };
 
         bindEventListeners(paramsOfBindEventListeners);
@@ -317,12 +318,16 @@ var colorPicker = (function(){
         var innerHTML = "";
 
             innerHTML += "<div style='display: inline-block; width: 80%;'>" 
-                + createSlide(this.cssClasses[0], this.cssClasses[1], "#cc7070")
-                + createSlide(this.cssClasses[2], this.cssClasses[3], "#7ec77e")
-                + createSlide(this.cssClasses[4], this.cssClasses[5], "#5757a5")
+                + createSlide(this.cssClasses[0], this.cssClasses[1], "#e03232")
+                + createSlide(this.cssClasses[2], this.cssClasses[3], "#2f902f")
+                + createSlide(this.cssClasses[4], this.cssClasses[5], "#3d3d9e")
                 + createSlide() + "</div>";
 
-            innerHTML += "<div style='display: inline-block; width: 18%;'>" + createInput() + createInput() + createInput() + createInput() + "</div>";
+            innerHTML += "<div style='display: inline-block; width: 18%;'>" 
+                + createInput(this.cssClasses[6], this.cssClasses[7]) 
+                + createInput(this.cssClasses[6], this.cssClasses[8]) 
+                + createInput(this.cssClasses[6], this.cssClasses[9]) 
+                + createInput(this.cssClasses[6], this.cssClasses[10]) + "</div>";
             innerHTML += createResult("this.cssClasses[5]", "this.cssClasses[6]");
 
         return innerHTML;
@@ -414,6 +419,10 @@ var colorPicker = (function(){
         
         var currentMousemoveElem,
             y = false;
+
+        var rgbaInputs = [7, 8, 9, 10].map(function(index){
+            return widgetDOM.querySelector("." + cssClassesForControl.slider[index]);
+        });
 
         inputStackDOM.forEach(function(input){
             input.addEventListener("click", clickInput, false); 
@@ -682,7 +691,57 @@ var colorPicker = (function(){
         }
 
         function sliderFn(e){
-            console.log(this, e);
+
+            var format = startColorFormat,
+                isGRBAMode = format === "rgba";
+            
+            var startOutputStringFrom = {
+                hex: "#",
+                rgb: "rgb(",
+                rgba: "rgba("
+            };
+
+            var endOutputString = {
+                hex: "",
+                rgb: ")",
+                rgba: ")"
+            };
+
+            var delimiter = {
+                hex: "",
+                rgb: ", ",
+                rgba: ", "
+            }
+
+            var useFnToBuildOutput = {
+                hex: function(value){ return decToHEX(value); },
+                rgb: function(value){ return +value; },
+                rgba: function(value){ return +value; }
+            };
+
+            var start = {
+                returnValue: "",
+                fns: useFnToBuildOutput,
+                startStr: startOutputStringFrom,
+                endStr: endOutputString,
+                delimiter: delimiter,
+            };
+
+            var value = rgbaInputs
+                .slice(0, isGRBAMode ? 4: 3)
+                .reduce(function(cur, next, idx, arr){
+
+                    cur.returnValue += (!idx ? cur.startStr[format] : "")
+                        + cur.fns[format](next.value) 
+                        + ((idx === arr.length - 1) ? "" : cur.delimiter[format])
+                        + ((idx === arr.length - 1) ? cur.endStr[format] : "");
+
+                    return cur;
+                }, start);
+
+            //console.log(value);
+
+            refreshCurrentInput(value.returnValue);
         }
         //Клик на элементе close
         function clickClose(){
@@ -710,6 +769,14 @@ var colorPicker = (function(){
                 if(!filteredStack.length)
                     hideWidget();
             }
+        }
+
+        function decToHEX(value){
+            return (+value < 10) ? "0" +value : (+value).toString(16);
+        }
+
+        function refreshCurrentInput(value){
+            currentInput.value = value;
         }
 
         function hideWidget(){
