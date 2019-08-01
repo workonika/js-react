@@ -158,6 +158,7 @@ var colorPicker = (function(){
             colorFormatsKeys: Object.keys(colorFormats[lang]),
             startWayName: startWayName,
             startColorFormat: startColorFormat,
+            colorNames: restructurize(colorNames),
         };
 
         bindEventListeners(paramsOfBindEventListeners);
@@ -357,6 +358,18 @@ var colorPicker = (function(){
             + "</div>"
     }
 
+    function restructurize(structure){
+        var returnMap = {};
+
+        structure.forEach(function(group){
+            group.colors.forEach(function(color){
+                this[color.name] = color.dec;
+            }, this);
+        }, returnMap);
+            
+        return returnMap;
+    }
+
     function bindEventListeners(params){
 
         var p = params,
@@ -368,9 +381,12 @@ var colorPicker = (function(){
             colorFormatsKeys = p.colorFormatsKeys,
             startWayName = p.startWayName,
             startColorFormat = p.startColorFormat,
+            colorNames = p.colorNames,
             commonColorFormatByDefault = "", //Нужно ли это?
             startValue = "",
             currentInput = undefined;
+
+        var rgba = {r: undefined, g: undefined, b: undefined, a: undefined, colorname: undefined};
 
         var oneWayDifferrentAreas, 
             squareDOMList, 
@@ -486,6 +502,7 @@ var colorPicker = (function(){
 
             widgetDOM.style.top = inputSizeAndPosition.top + inputSizeAndPosition.height + mu;
             widgetDOM.style.left = inputSizeAndPosition.left + mu;
+            initRGBA();
             displayWidget();
         }
         //События на colorpicker
@@ -692,8 +709,7 @@ var colorPicker = (function(){
 
         function sliderFn(e){
 
-            var format = startColorFormat,
-                isGRBAMode = format === "rgba";
+            var format = startColorFormat;
             
             var startOutputStringFrom = {
                 hex: "#",
@@ -728,7 +744,7 @@ var colorPicker = (function(){
             };
 
             var value = rgbaInputs
-                .slice(0, isGRBAMode ? 4: 3)
+                .slice(0, format.length)
                 .reduce(function(cur, next, idx, arr){
 
                     cur.returnValue += (!idx ? cur.startStr[format] : "")
@@ -773,6 +789,21 @@ var colorPicker = (function(){
 
         function decToHEX(value){
             return (+value < 10) ? "0" +value : (+value).toString(16);
+        }
+
+        function initRGBA(){
+            var value = currentInput.value,
+                regexp = /(#)([a-fA-F0-9]{3,6})|(rgba*\s*\()((\d{1,3})(,)\1\2\1\2(\d*\.?\+))/;
+            //
+            saveRGBA(/* params */);
+        }
+
+        function saveRGBA(r, g, b, a){
+            rgba.r = r;
+            rgba.g = g; 
+            rgba.b = b;
+            rgba.a = a; //undefined, если аргумент не передан при вызове
+            rgba.colorname = undefined;
         }
 
         function refreshCurrentInput(value){
