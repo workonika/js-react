@@ -47,7 +47,7 @@ JS. Виджет "Colorpicker"
     stackOfElemsForMousemoveEvent
     rgbaInputs
 
-Функция bindEventListeners
+Функции определенные внутри bindEventListeners
 --------------------------
     getNestedElems
     getDeepNestedElems
@@ -76,10 +76,6 @@ JS. Виджет "Colorpicker"
     displayWidget
     traversalDOMUp
 
-
-### Структуры данных функции bindEventListeners
-
-### Функции определенные внутри bindEventListeners
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker
 -------------------------------------------------------------------------------
