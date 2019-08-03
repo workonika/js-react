@@ -689,7 +689,6 @@ var colorPicker = (function(){
             });
         }
 
-        
         //Функции вызываемые на событие клик в области content
         function squareFn(stack){
             console.log(this, stack);

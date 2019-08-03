@@ -1,6 +1,9 @@
-# js-react-jquery
-Pure JS, jQuery and React components and widgets/ Use them as you want, but don`t forget to mention me as an author
+js-react-jquery
+===============
 
-##Идея заложенная в обработку событий клика в разных областях виджета colorpicker
-Полное описание процесса будет представлено примерно 27-28 июля 2019г.
-![DOM-дерево виджета](/img/IMG_20190725_194412.jpg)
+Pure JS, jQuery and React components and widgets/ Use them as you want, but don`t forget to mention me as an author
+Компоненты написаны: 
+1. На чистом JS
+2. Для библиотеки jQuery
+3. Для библиотеки React
+
