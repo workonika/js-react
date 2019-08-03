@@ -382,6 +382,7 @@ var colorPicker = (function(){
             startWayName = p.startWayName,
             startColorFormat = p.startColorFormat,
             colorNames = p.colorNames,
+            colorNamesList = Object.keys(colorNames),
             commonColorFormatByDefault = "", //Нужно ли это?
             startValue = "",
             currentInput = undefined;
@@ -791,19 +792,146 @@ var colorPicker = (function(){
             return (+value < 10) ? "0" +value : (+value).toString(16);
         }
 
-        function initRGBA(){
-            var value = currentInput.value,
-                regexp = /(#)([a-fA-F0-9]{3,6})|(rgba*\s*\()((\d{1,3})(,)\1\2\1\2(\d*\.?\+))/;
-            //
-            saveRGBA(/* params */);
+        function hexToDEC(value){
+            
+            value = ("" + value).toUpperCase(); 
+
+            var valueList = typeof value === "string" ? value.split("") : ("" + value).split(""),
+                alphabet = {"A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15,
+                    "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "0": 0
+                },
+                pow = function(num, pow){
+                    
+                    var origin = num; 
+
+                    if(pow === 0)
+                        return 1;
+
+                    if(pow === 1)
+                        return num;
+                   
+                    for(var i = 1; i < pow; i++){
+                        origin *= num;
+                    }
+                    return origin;
+                };
+            
+            valueList.reverse(); 
+
+            var returnValue = valueList.reduce(function(cur, next, idx){
+                return cur + alphabet[next] * pow(16, idx);
+            }, 0);
+
+            return returnValue;
         }
 
-        function saveRGBA(r, g, b, a){
-            rgba.r = r;
-            rgba.g = g; 
-            rgba.b = b;
-            rgba.a = a; //undefined, если аргумент не передан при вызове
-            rgba.colorname = undefined;
+        function validation(format, value){
+            //В будущих версиях нужно сделать валидацию данных вносимых в input
+        }
+
+        function initRGBA(){
+
+            var value = currentInput.value,
+                regexp = /(#|(?:rgba?))((?:[a-fA-F0-9]{3,6})|(?:\s*\((?:(?:\s*\d){1,3}\s*,?\s*){3}(?:\d?\.?\d+\s*)?\)))/;
+            
+            var result = value.match(regexp);
+
+            if(!result){
+                var valueTrimmed = value.trim();
+
+                var isExists = colorNamesList.some(function(colorName){
+                    return colorName === valueTrimmed;
+                });
+
+                if(isExists){
+                    result = [null, "colorname", valueTrimmed];
+                }
+            }
+                
+            
+            var componentsOfColor = {
+                "#"   : function(value){
+                    
+                    var rgb = value.split("");
+
+                    if(value.length === 3){
+                        return {
+                            r: rgb[0], g: rgb[1], b: rgb[2]
+                        };
+                    }
+
+                    else if(value.length === 6){
+                        var context = {result:[], str: ""};
+                        value.forEach(function(num){
+                            if(this.str.length === 2){
+                                this.result.push(this.str);
+                            } else {
+                                this.str += num;
+                            }
+                        }, context);
+
+                        var result = context.result;
+                        
+                        return {
+                            r: hexToDEC(result[0]),
+                            g: hexToDEC(result[1]),
+                            b: hexToDEC(result[2])
+                        }
+                    }
+
+                    else {
+                        alert("Вы ввели неверное количество символов!");
+                        //throw new Error("Введена неверная строка");
+                    }
+                },
+                "rgb" : function(value){
+
+                    var rgb = value.match(/\d+/g);
+
+                    return {
+                        r: +rgb[0],
+                        g: +rgb[1],
+                        b: +rgb[2]
+                    }
+                },
+                "rgba": function(value){
+                    var rgb = value.match(/\d+/g);
+                    var a = value.match(/(\d?\.?\d+)\s*\)/);
+
+                    return {
+                        r: +rgb[0],
+                        g: +rgb[1],
+                        b: +rgb[2],
+                        a: +a[1]
+                    };
+                },
+                "colorname": function(value){
+
+                    var valueTrimmed = value.trim();
+                    var rgb = colorNames[valueTrimmed];
+
+                    return {
+                        r: rgb.r,
+                        g: rgb.g,
+                        b: rgb.b,
+                        colorname: valueTrimmed
+                    }
+                }
+            };
+            
+            if(result)
+                saveRGBA(componentsOfColor[result[1]](result[2]));
+        }
+
+        function saveRGBA(params){
+            if(!params)
+                params = {};
+                
+            rgba.r = params.r;
+            rgba.g = params.g; 
+            rgba.b = params.b;
+            rgba.a = params.a; //undefined, если аргумент не передан при вызове
+            rgba.colorname = params.colorname; //undefined, если аргумент не передан при вызове
         }
 
         function refreshCurrentInput(value){
