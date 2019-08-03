@@ -3,28 +3,28 @@ JS. Виджет "Colorpicker"
 
 Структуры данных виджета
 -------------------------
-wayOfGettingColor
-colorFormats
-matchFormatToMethod
-colorNames
-inputStackDOM
-cssClassesForControl
+    wayOfGettingColor
+    colorFormats
+    matchFormatToMethod
+    colorNames
+    inputStackDOM
+    cssClassesForControl
 
 Функции виджета
 ---------------
-colorPicker
-display
-border
-getInputSizeAndPosition
-createWidgetDOMElement
-buildSquare
-buildRect
-buildSlider
-createResult
-createSlide
-createInput
-restructurize
-bindEventListeners
+    colorPicker
+    display
+    border
+    getInputSizeAndPosition
+    createWidgetDOMElement
+    buildSquare
+    buildRect
+    buildSlider
+    createResult
+    createSlide
+    createInput
+    restructurize
+    bindEventListeners
 
 Функция bindEventListeners
 --------------------------
