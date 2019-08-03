@@ -1,18 +1,9 @@
 JS. Виджет "Colorpicker"
 ========================
 
-Структуры данных виджета
--------------------------
-    wayOfGettingColor
-    colorFormats
-    matchFormatToMethod
-    colorNames
-    inputStackDOM
-    cssClassesForControl
-
 Функции виджета
 ---------------
-    colorPicker
+    colorPicker - возвращаемая функция из модуля (IIFE)
     display
     border
     getInputSizeAndPosition
@@ -26,12 +17,69 @@ JS. Виджет "Colorpicker"
     restructurize
     bindEventListeners
 
+Структуры данных colorPicker
+-------------------------
+    wayOfGettingColor
+    colorFormats
+    matchFormatToMethod
+    colorNames
+    inputStackDOM
+    cssClassesForControl
+
+Структуры данных bindEventListeners
+--------------------------
+    rgba
+    oneWayDifferrentAreas
+    inputStackDOM
+    getInputSizeAndPosition
+    cssClassesForControl
+    waysOfGettingColorKeys
+    colorFormatsKeys
+    colorNames
+    colorNamesList
+    squareDOMList
+    rectDOMList
+    sliderDOMList
+    waysDOM
+    formatsDOM
+    contentDOM
+    contentAreaEventsHandles
+    stackOfElemsForMousemoveEvent
+    rgbaInputs
+
 Функция bindEventListeners
 --------------------------
+    getNestedElems
+    getDeepNestedElems
+    matchingElements
+    clickInput
+    widgetEventsHandler
+    switchWay
+    chooseFormat
+    getValue
+    mousedown
+    mouseup
+    mousemove
+    click
+    squareFn
+    rectFn
+    sliderFn
+    clickClose
+    clickOutOfWidget
+    decToHEX
+    hexToDEC
+    validation
+    initRGBA
+    saveRGBA
+    refreshCurrentInput
+    hideWidget
+    displayWidget
+    traversalDOMUp
 
-###Структуры данных функции bindEventListeners
 
-###Функции определенные внутри bindEventListeners
+### Структуры данных функции bindEventListeners
+
+### Функции определенные внутри bindEventListeners
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker
 -------------------------------------------------------------------------------
