@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test hex to dec</title>
+    </head>
+    <body>
+        <script>
+        var values = ["Ff", "fF", "FF", "ff", "aA", "Ab", "Bf", "2f", 10, 11, 55, 100, 200, 300, "FFF", "FFFF", "FFFFF", "FFFFFF"];
+
+        var decimalValues = values.map(function(hex){return {hex: hex, dec: hexToDEC(hex)}});
+        console.log(decimalValues);
+        
+        function hexToDEC(value){
+            
+            value = ("" + value).toUpperCase(); 
+
+            var valueList = typeof value === "string" ? value.split("") : ("" + value).split(""),
+                alphabet = {"A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15,
+                    "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "0": 0
+                },
+                pow = function(num, pow){
+                    
+                    var origin = num; 
+
+                    if(pow === 0)
+                        return 1;
+
+                    if(pow === 1)
+                        return num;
+                   
+                    for(var i = 1; i < pow; i++){
+                        origin *= num;
+                    }
+                    return origin;
+                };
+            
+            valueList.reverse(); 
+
+            var returnValue = valueList.reduce(function(cur, next, idx){
+                return cur + alphabet[next] * pow(16, idx);
+            }, 0);
+
+            return returnValue;
+        }
+        </script>
+    </body>
+</html>
