@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test RegExp</title>
+    </head>
+    <body>
+        <script>
+            var testValues = [
+                "rgb(23,24,25, 0.34)",
+                "rgb(1,2,3, .3)",
+                "rgb(1,22,255, 1)",
+                "rgb ( 1, 1, 1 , .234)",
+                "rgb (22,255   ,   2, 0.45)",
+                "rgba(1,2,3, 0.1)",
+            ];
+
+            var regexp = /(\d?\.?\d+)\s*\)/;
+
+            testValues.forEach(function(str){
+                var result = str.match(regexp);
+                console.log(str, result, +result[1]);
+            });    
+        </script>
+    </body>
+</html>
