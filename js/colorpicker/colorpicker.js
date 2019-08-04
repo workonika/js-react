@@ -13,10 +13,6 @@ var colorPicker = (function(){
                     name: "Заготовленные цвета",
                     order: 0
                 },
-                rect: {
-                    name: "Спектр",
-                    order: 1
-                },
                 slider: {
                     name: "Слайдер",
                     order: 2
@@ -61,20 +57,6 @@ var colorPicker = (function(){
                     name: "webnames", match: true, order: 0
                 }
             ],
-            rect: [ 
-                {
-                    name: "rgb", match: true, order: 2
-                }, 
-                {
-                    name: "hex", match: true, order: 1
-                }, 
-                {
-                    name: "rgba", match: false, order: 0
-                }, 
-                {
-                    name: "webnames", match: false, order: 0
-                }
-            ],
             slider: [ 
                 {
                     name: "rgb", match: true, order: 2
@@ -101,7 +83,7 @@ var colorPicker = (function(){
             if(input.length){
                 console.warn("Вы передали некорректный селектор!\nВиджет colorpicker не прикреплён ни к одному из DOM-элементов input\n\
                 в текущем документе присутствуют следующие элементы input");
-                console.group("Элументы input");
+                console.group("Элементы input");
                 [].slice.call(input).forEach(function(el){console.log(el)});
                 console.groupEnd();
             } else {
@@ -124,8 +106,6 @@ var colorPicker = (function(){
         var cssClassesForControl = {
                 area: ["way-of-getting-color", "color-formats", "content-of-way"],
                 square: ["webnames", "rgb"],
-                rect: ["rectangle-chooser-color", "rectangle-color", "pointer-color", "spectr-color", 
-                        "slider-color", "choosed-color", "button-choose-result-color"],
                 slider: ["parent-red", "slide-red", "parent-green", "slide-green", "parent-blue", 
                         "slide-blue", "slide-input", "r", "g", "b", "alpha"]
             },
@@ -214,7 +194,6 @@ var colorPicker = (function(){
 
         var contentMap = {
             square: buildSquare.bind({cssClasses: cssClassesForControl.square, colors: p.colorNames, size: {width: 20, height: 20}}),
-            rect: buildRect.bind({cssClasses: cssClassesForControl.rect}),
             slider: buildSlider.bind({cssClasses: cssClassesForControl.slider}),
         };
         
@@ -277,40 +256,12 @@ var colorPicker = (function(){
             colorGroup.colors.forEach(function(color){
                 innerHTML += "<div style='width:" + this.size.width + "px; height:" 
                     + this.size.height + "px; background:" 
-                    + color.name + "; display: inline-block;' data-value='" + color.name 
+                    + color.name + "; display: inline-block;' data-colorname='" + color.name 
                     + "' title='" + color.name + " rgb(" + color.dec.r + ", " + color.dec.g + ", " + color.dec.b + ")'"
                     + "' data-r='" + color.dec.r + "' data-g='" + color.dec.g + "' data-b='" + color.dec.b + "'>"
                     + "</div>";
             }, this);
         }, this);
-
-        return innerHTML;
-    }
-
-    function buildRect(){
-        var innerHTML = "",
-            gradientColors = "#ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000";
-
-            //Меняться будет цвет только у верхнего div
-            innerHTML +=
-                "<div class='" + this.cssClasses[0] + "'>"
-                    + "<div class='" + this.cssClasses[1] + "' style='position: relative; background: #ff0000; width: 100%; height: 110px; margin-bottom: 15px;'>"
-                        + "<div class='" + this.cssClasses[2] + "' style='position: absolute; z-index: 4; top: 0; left: 0; \
-                        border-radius:100%; width: 6px; height: 6px; border: 4px solid white;'></div>"
-                        + "<div style='position: absolute; width: 100%; height: 100%; \
-                        background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);'></div>"
-                        + "<div style='position: absolute; width: 100%; height: 100%; \
-                        background: linear-gradient(to bottom, transparent 0%, #000 100%);'></div>"
-                    + "</div>"
-                    + "<div class='" + this.cssClasses[3] + "' style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent'>"
-                        + "<div class='" + this.cssClasses[4] + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
-                        + "<div style='margin-top:4px; background:linear-gradient(to right," 
-                        + gradientColors + "); width: 100%; height: 20px;'></div>"
-                    + "</div>"
-
-                    + createResult(this.cssClasses[5], this.cssClasses[6])
-                    
-                + "</div>";
 
         return innerHTML;
     }
@@ -393,11 +344,10 @@ var colorPicker = (function(){
         var rgba = {r: undefined, g: undefined, b: undefined, a: undefined, colorname: undefined};
 
         var oneWayDifferrentAreas, 
-            squareDOMList, 
-            rectDOMList,
+            squareDOMList,
             sliderDOMList; 
 
-        oneWayDifferrentAreas = [squareDOMList, rectDOMList, sliderDOMList];
+        oneWayDifferrentAreas = [squareDOMList, sliderDOMList];
 
         oneWayDifferrentAreas = waysOfGettingColorKeys.map(function(cssClass){
             return [].slice.call(widgetDOM.querySelectorAll("." + cssClass));
@@ -409,17 +359,12 @@ var colorPicker = (function(){
             formatsDOM = getDeepNestedElems(cssClassesForControl.area[1]),
             contentDOM = getNestedElems(cssClassesForControl.area[2]);
 
-        var contentAreaEventsHandles = [squareFn, rectFn, sliderFn];
-
+        var contentAreaEventsHandles = [squareFn, sliderFn];
+        /**
+         * @todo В связи с отсутствием необходимости вычисления значений координат по оси Y 
+         * пересмотреть эту структуры данных
+         */
         var stackOfElemsForMousemoveEvent = [
-                { 
-                    cssClass: cssClassesForControl.rect[2], 
-                    y: true 
-                },
-                { 
-                    cssClass: cssClassesForControl.rect[4], 
-                    y: false 
-                },
                 { 
                     cssClass: cssClassesForControl.slider[1], 
                     y: false 
@@ -436,7 +381,10 @@ var colorPicker = (function(){
                 return { DOM: widgetDOM.querySelector("." + obj.cssClass), y: obj.y };
             });
 
-        
+        /**
+         * @todo В связи с отсутствием необходимости вычисления значений координат по оси Y 
+         * пересмотреть эти переменные
+         */
         var currentMousemoveElem,
             y = false;
 
@@ -447,7 +395,9 @@ var colorPicker = (function(){
         inputStackDOM.forEach(function(input){
             input.addEventListener("click", clickInput, false); 
         });
-
+        /**
+         * @todo Сделать единообразную обработку события клик -> в widgetEventsHandler
+         */
         var close = widgetDOM.querySelector(".close");
         close.addEventListener("click", clickClose, false);
 
@@ -510,6 +460,11 @@ var colorPicker = (function(){
             displayWidget();
         }
         //События на colorpicker
+        /**
+         * Обрабатываются события всех типов. Но не очевидно, какие события допущены к обработке тем или иным 
+         * разделом. @todo Поставить 
+         * @param {Event} e 
+         */
         function widgetEventsHandler(e){
             var 
                 type = e.type,
@@ -694,20 +649,21 @@ var colorPicker = (function(){
 
         //Функции вызываемые на событие клик в области content
         function squareFn(stack){
-            console.log(this, stack);
-                          
-            //waysOfGettingColorKeys = p.waysOfGettingColorKeys,
-            //colorFormatsKeys = p.colorFormatsKeys,
-            //startWayName = p.startWayName,
-            //startColorFormat = p.startColorFormat,
-            //startValue = "",
-            //currentInput 
+                        
+            var rgbaMap = {};
 
-            //hideWidget();
-        }
-
-        function rectFn(e){
-            console.log(this, e);
+            stack.forEach(function(item){
+                var isContainColornameData = item.hasAttribute("data-colorname");
+                if(isContainColornameData){
+                    this.r = item.getAttribute("data-r");
+                    this.g = item.getAttribute("data-g");
+                    this.b = item.getAttribute("data-b");
+                    this.colorname = item.getAttribute("data-colorname");
+                }
+            }, rgbaMap);
+            
+            saveRGBA(rgbaMap);
+            refreshCurrentInput();
         }
 
         function sliderFn(stack){
@@ -730,9 +686,15 @@ var colorPicker = (function(){
         function createOutputValueString(){
 
             var format = startColorFormat;
-
-            console.log(format, "rgba", rgba);
+            /**
+             * Мне не особо нравится эта идея, но я на ней остановился. 
+             * Возможно изначально неправильно продумана архитектура.
+             */
+            if(format === "webnames")
+                return rgba.colorname.toLowerCase();
             
+            var __p__ = String.prototype; 
+
             var startOutputStringFrom = {
                 hex: "#",
                 rgb: "rgb(",
@@ -751,6 +713,12 @@ var colorPicker = (function(){
                 rgba: ", "
             }
 
+            var register = {
+                hex: __p__.toUpperCase,
+                rgb: __p__.toLowerCase,
+                rgba: __p__.toLowerCase
+            }
+
             var useFnToBuildOutput = {
                 hex: function(value){ return decToHEX(value); },
                 rgb: function(value){ return +value; },
@@ -765,20 +733,20 @@ var colorPicker = (function(){
                 delimiter: delimiter,
             };
 
-            var returnMap = rgba
+            var returnMap = 
+                [rgba.r, rgba.g, rgba.b, rgba.a]
                 .slice(0, format.length)
                 .reduce(function(cur, next, idx, arr){
-
+                    var value = cur.fns[format](next);
                     cur.returnValue += (!idx ? cur.startStr[format] : "")
-                        + cur.fns[format](next.value) 
+                        + cur.fns[format](next) 
                         + ((idx === arr.length - 1) ? "" : cur.delimiter[format])
                         + ((idx === arr.length - 1) ? cur.endStr[format] : "");
 
                     return cur;
                 }, start);
 
-            console.log("returnMap", returnMap);
-            return returnMap.returnValue;
+            return register[format].call(returnMap.returnValue);
         }
         //Проверка, где сделан клик и если вне colorpicker, то закрывается colorpicker
         function clickOutOfWidget(e){
@@ -878,7 +846,7 @@ var colorPicker = (function(){
 
                     else if(value.length === 6){
                         var context = {result:[], str: ""};
-                        value.forEach(function(num){
+                        rgb.forEach(function(num){
                             if(this.str.length === 2){
                                 this.result.push(this.str);
                             } else {
@@ -951,7 +919,9 @@ var colorPicker = (function(){
         }
 
         function refreshCurrentInput(){
+            console.log(rgba);
             currentInput.value = createOutputValueString();
+            hideWidget();
         }
 
         function hideWidget(){
