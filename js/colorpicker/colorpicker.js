@@ -105,7 +105,7 @@ var colorPicker = (function(){
 
         var cssClassesForControl = {
                 area: ["way-of-getting-color", "color-formats", "content-of-way"],
-                square: ["webnames", "rgb"],
+                square: ["webnames", "rgb", "webname-value"],
                 slider: ["parent-red", "slide-red", "parent-green", "slide-green", "parent-blue", 
                         "slide-blue", "slide-input", "r", "g", "b", "a", "confirm-button"]
             },
@@ -254,7 +254,7 @@ var colorPicker = (function(){
             //innerHTML += "<div>" + colorGroup.groupName + "</div>";
             //При необходимости можно выводить имена групп цветов - тогда нужно расскомментировать предыдущую строку
             colorGroup.colors.forEach(function(color){
-                innerHTML += "<div style='width:" + this.size.width + "px; height:" 
+                innerHTML += "<div class='" + this.cssClasses[2] + "' style='width:" + this.size.width + "px; height:" 
                     + this.size.height + "px; background:" 
                     + color.name + "; display: inline-block;' data-colorname='" + color.name 
                     + "' title='" + color.name + " rgb(" + color.dec.r + ", " + color.dec.g + ", " + color.dec.b + ")'"
@@ -398,6 +398,8 @@ var colorPicker = (function(){
             return widgetDOM.querySelector("." + cssClass);
         });
 
+        var webnamesDOMList = [].slice.call(widgetDOM.querySelectorAll("." + cssClassesForControl.square[2]));
+
         inputStackDOM.forEach(function(input){
             input.addEventListener("click", clickInput, false); 
         });
@@ -463,6 +465,7 @@ var colorPicker = (function(){
             widgetDOM.style.top = inputSizeAndPosition.top + inputSizeAndPosition.height + mu;
             widgetDOM.style.left = inputSizeAndPosition.left + mu;
             initRGBA();
+            setWebnameFocus();
             displayWidget();
         }
         //События на colorpicker
@@ -730,7 +733,7 @@ var colorPicker = (function(){
                 [rgba.r, rgba.g, rgba.b, rgba.a]
                 .slice(0, format.length)
                 .reduce(function(cur, next, idx, arr){
-                    var value = cur.fns[format](next);
+                    
                     cur.returnValue += (!idx ? cur.startStr[format] : "")
                         + cur.fns[format](next) 
                         + ((idx === arr.length - 1) ? "" : cur.delimiter[format])
@@ -825,7 +828,6 @@ var colorPicker = (function(){
                 }
             }
                 
-            
             var componentsOfColor = {
                 "#"   : function(value){
                     
@@ -847,7 +849,6 @@ var colorPicker = (function(){
 
                     else {
                         alert("Вы ввели неверное количество символов!");
-                        //throw new Error("Введена неверная строка");
                     }
                 },
                 "rgb" : function(value){
@@ -887,6 +888,28 @@ var colorPicker = (function(){
             
             if(result)
                 saveRGBA(componentsOfColor[result[1]](result[2]));
+        }
+
+        function setWebnameFocus(){
+
+            webnamesDOMList.forEach(function(item){
+                
+                var isEqual = rgba.colorname 
+                    ? item.getAttribute("data-colorname") === rgba.colorname
+                    : (+item.getAttribute("data-r") === rgba.r
+                    && +item.getAttribute("data-g") === rgba.g
+                    && +item.getAttribute("data-b") === rgba.b);
+
+                if(isEqual){
+                    item.style.boxSizing = "border-box";
+                    item.style.border = "2px solid black";
+                } else {
+                    item.style.boxSizing = "content-box";
+                    item.style.border = "none";
+                }
+            });
+
+            return false;
         }
 
         function saveRGBA(params){
