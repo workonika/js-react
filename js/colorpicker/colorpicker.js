@@ -387,7 +387,9 @@ var colorPicker = (function(){
          */
         var currentMousemoveElem,
             y = false;
-
+        /**
+         * @todo На этапе рефакторинга: 1) переименовать 2) убрать индексы - сделать ссылки на классы
+         */
         var rgbaInputs = [7, 8, 9, 10].map(function(index){
             return widgetDOM.querySelector("." + cssClassesForControl.slider[index]);
         });
@@ -589,11 +591,6 @@ var colorPicker = (function(){
         }
 
         function mousedown(stack){
-
-            // matchingElements(stack, stackOfElemsForMousemoveEvent, function(){
-            //     var arg = [].slice.call(arguments)[0];
-            //     currentMousemoveElem = arg.match;
-            // });
 
             stack.forEach(function(arr1DOMElem){
                 stackOfElemsForMousemoveEvent.forEach(function(arr2DOMElem){
@@ -836,26 +833,15 @@ var colorPicker = (function(){
 
                     if(value.length === 3){
                         return {
-                            r: rgb[0], g: rgb[1], b: rgb[2]
+                            r: hexToDec(rgb[0]), g: hexToDec(rgb[1]), b: hexToDec(rgb[2])
                         };
                     }
 
                     else if(value.length === 6){
-                        var context = {result:[], str: ""};
-                        rgb.forEach(function(num){
-                            if(this.str.length === 2){
-                                this.result.push(this.str);
-                            } else {
-                                this.str += num;
-                            }
-                        }, context);
-
-                        var result = context.result;
-                        
                         return {
-                            r: hexToDEC(result[0]),
-                            g: hexToDEC(result[1]),
-                            b: hexToDEC(result[2])
+                            r: hexToDEC(rgb[0] + rgb[1]),
+                            g: hexToDEC(rgb[2] + rgb[3]),
+                            b: hexToDEC(rgb[4] + rgb[5])
                         }
                     }
 
@@ -912,6 +898,7 @@ var colorPicker = (function(){
             rgba.b = params.b;
             rgba.a = params.a; //undefined, если аргумент не передан при вызове
             rgba.colorname = params.colorname; //undefined, если аргумент не передан при вызове
+            console.log("RGBA", rgba);
         }
 
         function hideWidget(){
