@@ -107,7 +107,7 @@ var colorPicker = (function(){
                 area: ["way-of-getting-color", "color-formats", "content-of-way"],
                 square: ["webnames", "rgb"],
                 slider: ["parent-red", "slide-red", "parent-green", "slide-green", "parent-blue", 
-                        "slide-blue", "slide-input", "r", "g", "b", "alpha"]
+                        "slide-blue", "slide-input", "r", "g", "b", "a", "confirm-button"]
             },
             waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
             startWayName = "square",
@@ -280,7 +280,7 @@ var colorPicker = (function(){
                 + createInput(this.cssClasses[6], this.cssClasses[8], "g") 
                 + createInput(this.cssClasses[6], this.cssClasses[9], "b") 
                 + createInput(this.cssClasses[6], this.cssClasses[10], "a") + "</div>";
-            innerHTML += createResult("this.cssClasses[5]", "this.cssClasses[6]");
+            innerHTML += createResult("this.cssClasses[5]", this.cssClasses[11]);
 
         return innerHTML;
     }
@@ -390,6 +390,10 @@ var colorPicker = (function(){
 
         var rgbaInputs = [7, 8, 9, 10].map(function(index){
             return widgetDOM.querySelector("." + cssClassesForControl.slider[index]);
+        });
+
+        var confirmButtonsList = [cssClassesForControl.slider[11], ].map(function(cssClass){
+            return widgetDOM.querySelector("." + cssClass);
         });
 
         inputStackDOM.forEach(function(input){
@@ -624,17 +628,7 @@ var colorPicker = (function(){
                 geometryTarget = t.getBoundingClientRect();
 
             var deltaX = e.pageX - (pageXOffset + geometryParent.left);
-            
-            var deltaY = e.pageY - (pageYOffset + geometryParent.top);
 
-            //console.log("e.pageY", e.pageY, "geometryParent.top", geometryParent.top, "parent.clientHeight", parent.clientHeight, "pageYOffset", pageYOffset);
-            //console.log("e.pageX", e.pageX, "geometryParent.left", geometryParent.left, "parent.clientWidth", parent.clientWidth, "pageXOffset", pageXOffset);
-            
-            if(y){
-                t.style.top = ((deltaY >= geometryParent.height - geometryTarget.height) ?
-                    geometryParent.height - geometryTarget.height : deltaY) + "px";
-            }
-            
             t.style.left = ((deltaX >= geometryParent.width - geometryTarget.width) ? 
                     geometryParent.width - geometryTarget.width : deltaX) + "px";
         }
@@ -648,6 +642,7 @@ var colorPicker = (function(){
         }
 
         //Функции вызываемые на событие клик в области content
+        //Эти функции ответственны за корректную передачу данных в saveRGBA
         function squareFn(stack){
                         
             var rgbaMap = {};
@@ -661,20 +656,21 @@ var colorPicker = (function(){
                     this.colorname = item.getAttribute("data-colorname");
                 }
             }, rgbaMap);
-            
-            saveRGBA(rgbaMap);
-            refreshCurrentInput();
+
+            endupChoice(rgbaMap);
         }
 
         function sliderFn(stack){
+            
             var rgbaMap = {};
 
             rgbaInputs.forEach(function(channel){
                 this[channel.name] = channel.value;
             }, rgbaMap);
 
-            saveRGBA(rgbaMap);
-            refreshCurrentInput();
+            matchingElements(stack, confirmButtonsList, function(){
+                endupChoice(rgbaMap);
+            });
         }
         //Клик на элементе close
         function clickClose(){
@@ -918,16 +914,20 @@ var colorPicker = (function(){
             rgba.colorname = params.colorname; //undefined, если аргумент не передан при вызове
         }
 
-        function refreshCurrentInput(){
-            console.log(rgba);
-            currentInput.value = createOutputValueString();
-            hideWidget();
-        }
-
         function hideWidget(){
             document.removeEventListener("click", clickOutOfWidget, false);
             widgetDOM.style.display = "none";
             inputStackDOM.forEach(function(input){input.removeAttribute("data-is-colorpicker-opened");});
+        }
+
+        function endupChoice(rgbaMap){
+
+            if(!rgbaMap.r && !rgbaMap.g && !rgbaMap.b)
+                return false;
+            
+            saveRGBA(rgbaMap);
+            currentInput.value = createOutputValueString();
+            hideWidget();
         }
 
         function displayWidget(){

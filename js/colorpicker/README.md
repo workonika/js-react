@@ -72,11 +72,11 @@ JS. Виджет "Colorpicker"
     validation
     initRGBA
     saveRGBA
-    refreshCurrentInput
     hideWidget
     displayWidget
     traversalDOMUp
     createOutputValueString
+    endupChoice
 
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker
