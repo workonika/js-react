@@ -325,10 +325,10 @@ var colorPicker = (function(){
                 + createSlide() + "</div>";
 
             innerHTML += "<div style='display: inline-block; width: 18%;'>" 
-                + createInput(this.cssClasses[6], this.cssClasses[7]) 
-                + createInput(this.cssClasses[6], this.cssClasses[8]) 
-                + createInput(this.cssClasses[6], this.cssClasses[9]) 
-                + createInput(this.cssClasses[6], this.cssClasses[10]) + "</div>";
+                + createInput(this.cssClasses[6], this.cssClasses[7], "r") 
+                + createInput(this.cssClasses[6], this.cssClasses[8], "g") 
+                + createInput(this.cssClasses[6], this.cssClasses[9], "b") 
+                + createInput(this.cssClasses[6], this.cssClasses[10], "a") + "</div>";
             innerHTML += createResult("this.cssClasses[5]", "this.cssClasses[6]");
 
         return innerHTML;
@@ -352,9 +352,12 @@ var colorPicker = (function(){
             + "</div>"
     }
 
-    function createInput(first, second){
-        return "<div class='" + first + "' style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
-                + "<input class='" + second + "' style='position: absolute; width: 100%; height: 28px; border: 1px solid black; left: 0; top: 0' />"
+    function createInput(first, second, name){
+        return "<div class='" + first 
+                + "' style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
+                + "<input name='" + name
+                + "' class='" + second 
+                + "' style='position: absolute; width: 100%; height: 28px; border: 1px solid black; left: 0; top: 0' />"
             + "</div>"
     }
 
@@ -707,9 +710,28 @@ var colorPicker = (function(){
             console.log(this, e);
         }
 
-        function sliderFn(e){
+        function sliderFn(stack){
+            var rgbaMap = {};
+
+            rgbaInputs.forEach(function(channel){
+                this[channel.name] = channel.value;
+            }, rgbaMap);
+
+            saveRGBA(rgbaMap);
+            refreshCurrentInput();
+        }
+        //Клик на элементе close
+        function clickClose(){
+            hideWidget();
+        }
+/**
+ * @todo Переписать функцию, чтобы она была универсальной для всех форматов
+ */
+        function createOutputValueString(){
 
             var format = startColorFormat;
+
+            console.log(format, "rgba", rgba);
             
             var startOutputStringFrom = {
                 hex: "#",
@@ -743,7 +765,7 @@ var colorPicker = (function(){
                 delimiter: delimiter,
             };
 
-            var value = rgbaInputs
+            var returnMap = rgba
                 .slice(0, format.length)
                 .reduce(function(cur, next, idx, arr){
 
@@ -755,13 +777,8 @@ var colorPicker = (function(){
                     return cur;
                 }, start);
 
-            //console.log(value);
-
-            refreshCurrentInput(value.returnValue);
-        }
-        //Клик на элементе close
-        function clickClose(){
-            hideWidget();
+            console.log("returnMap", returnMap);
+            return returnMap.returnValue;
         }
         //Проверка, где сделан клик и если вне colorpicker, то закрывается colorpicker
         function clickOutOfWidget(e){
@@ -933,8 +950,8 @@ var colorPicker = (function(){
             rgba.colorname = params.colorname; //undefined, если аргумент не передан при вызове
         }
 
-        function refreshCurrentInput(value){
-            currentInput.value = value;
+        function refreshCurrentInput(){
+            currentInput.value = createOutputValueString();
         }
 
         function hideWidget(){

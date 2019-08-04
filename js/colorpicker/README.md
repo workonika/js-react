@@ -76,6 +76,7 @@ JS. Виджет "Colorpicker"
     hideWidget
     displayWidget
     traversalDOMUp
+    createOutputValueString
 
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker
