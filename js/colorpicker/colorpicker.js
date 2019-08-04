@@ -466,6 +466,7 @@ var colorPicker = (function(){
             widgetDOM.style.left = inputSizeAndPosition.left + mu;
             initRGBA();
             setWebnameFocus();
+            setValueSliderInput();
             displayWidget();
         }
         //События на colorpicker
@@ -910,6 +911,13 @@ var colorPicker = (function(){
             });
 
             return false;
+        }
+
+        function setValueSliderInput(){
+            rgbaInputs.forEach(function(item){
+                var value = rgba[item.getAttribute("name")];
+                item.value = value !== undefined ? value : "";
+            });
         }
 
         function saveRGBA(params){

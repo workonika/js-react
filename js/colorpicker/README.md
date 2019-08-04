@@ -77,6 +77,8 @@ JS. Виджет "Colorpicker"
     traversalDOMUp
     createOutputValueString
     endupChoice
+    setWebnameFocus
+    setValueSliderInput
 
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker
