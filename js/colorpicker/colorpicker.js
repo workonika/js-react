@@ -30,10 +30,6 @@ var colorPicker = (function(){
                     name: "hex",
                     order: 1
                 }, 
-                rgba: {
-                    name: "rgba", 
-                    order: 2
-                }, 
                 webnames: {
                     name: "html названия цветов",
                     order: 3
@@ -51,9 +47,6 @@ var colorPicker = (function(){
                     name: "hex", match: true, order: 1
                 }, 
                 {
-                    name: "rgba", match: false, order: 0
-                }, 
-                {
                     name: "webnames", match: true, order: 0
                 }
             ],
@@ -63,10 +56,7 @@ var colorPicker = (function(){
                 }, 
                 {
                     name: "hex", match: true, order: 1
-                }, 
-                {
-                    name: "rgba", match: true, order: 0
-                }, 
+                },
                 {
                     name: "webnames", match: false, order: 0
                 }
@@ -272,14 +262,13 @@ var colorPicker = (function(){
             innerHTML += "<div style='display: inline-block; width: 80%;'>" 
                 + createSlide(this.cssClasses[0], this.cssClasses[1], "#e03232")
                 + createSlide(this.cssClasses[2], this.cssClasses[3], "#2f902f")
-                + createSlide(this.cssClasses[4], this.cssClasses[5], "#3d3d9e")
-                + createSlide(this.cssClasses[12], this.cssClasses[13], "linear-gradient(to right, black, white);") + "</div>";
+                + createSlide(this.cssClasses[4], this.cssClasses[5], "#3d3d9e") + "</div>";
 
             innerHTML += "<div style='display: inline-block; width: 18%;'>" 
                 + createInput(this.cssClasses[6], this.cssClasses[7], "r") 
                 + createInput(this.cssClasses[6], this.cssClasses[8], "g") 
-                + createInput(this.cssClasses[6], this.cssClasses[9], "b") 
-                + createInput(this.cssClasses[6], this.cssClasses[10], "a") + "</div>";
+                + createInput(this.cssClasses[6], this.cssClasses[9], "b") + "</div>";
+
             innerHTML += createResult(this.cssClasses[14], this.cssClasses[11]);
 
         return innerHTML;
@@ -296,7 +285,7 @@ var colorPicker = (function(){
             + "</div>";
     }
 
-    function createSlide(parent, slide, color, isAlphaChannel){
+    function createSlide(parent, slide, color){
         return "<div class='" + parent + "' style='position: relative; width: 98%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
                 + "<div data-channel='" + slide + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
                 + "<div style='margin-top:4px; width: 100%; height: 20px; box-sizing: border-box; border: 1px solid grey; background:" + color + ";'></div>"
@@ -332,33 +321,18 @@ var colorPicker = (function(){
             getInputSizeAndPosition = p.getInputSizeAndPosition,
             cssClassesForControl = p.cssClassesForControl,
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
+            colorFormat = p.startColorFormat,
             colorFormatsKeys = p.colorFormatsKeys,
             startWayName = p.startWayName,
             colorNames = p.colorNames,
             colorNamesList = Object.keys(colorNames),
-            commonColorFormatByDefault = "", //Нужно ли это?
-            startValue = "",
             currentInput = undefined;
 
-        var rgba = {r: undefined, g: undefined, b: undefined, a: undefined, colorname: undefined};
+        var rgb = {r: undefined, g: undefined, b: undefined, colorname: undefined};
 
         var oneWayDifferrentAreas, 
             squareDOMList,
             sliderDOMList;
-
-        var colorFormat = {
-            value: p.startColorFormat,
-            set current (value){
-                disableAlphaChannel(value);
-                this.vlaue = value;
-            },
-            get current (){
-                disableAlphaChannel(this.value);
-                return this.value;
-            },
-        };
-
-        window.colorFormat = colorFormat;
 
         oneWayDifferrentAreas = [squareDOMList, sliderDOMList];
 
@@ -368,8 +342,7 @@ var colorPicker = (function(){
 
         //oneAreaDifferentWays
         //Нет никакого смысла запихивать в массив, так как formats уже является двумерным массивом
-        var waysDOM = getNestedElems(cssClassesForControl.area[0]),
-            formatsDOM = getDeepNestedElems(cssClassesForControl.area[1]),
+        var formatsDOM = getDeepNestedElems(cssClassesForControl.area[1]),
             contentDOM = getNestedElems(cssClassesForControl.area[2]);
 
         var contentAreaEventsHandles = [squareFn, sliderFn];
@@ -382,15 +355,16 @@ var colorPicker = (function(){
         /**
          * @todo На этапе рефакторинга: 1) переименовать 2) убрать индексы - сделать ссылки на классы
          */
-        var rgbaInputsList = [7, 8, 9, 10].map(function(index){
+        var rgbInputsList = [7, 8, 9].map(function(index){
             return widgetDOM.querySelector("." + cssClassesForControl.slider[index]);
         });
+        
+        console.log(rgbInputsList);
 
         var slidersList = [
             {slider: 1, parent: 0}, 
             {slider: 3, parent: 2}, 
-            {slider: 5, parent: 4}, 
-            {slider: 13, parent: 12}
+            {slider: 5, parent: 4},
         ].map(function(obj){
             var css = cssClassesForControl.slider,
                 slider =  widgetDOM.querySelector("[data-channel='" + css[obj.slider] + "']"),
@@ -399,10 +373,7 @@ var colorPicker = (function(){
                 return { slider: slider, parent: parent };
         });
 
-        var alphaChannelSliderDOM = widgetDOM.querySelector("[data-channel='" + cssClassesForControl.slider[13] + "']");
-
-        console.log(rgbaInputsList);
-        console.log(slidersList);
+        console.log(slidersList)
 
         var sliderResultDOM = getDOM(cssClassesForControl.slider[14]);
         
@@ -480,7 +451,8 @@ var colorPicker = (function(){
 
             widgetDOM.style.top = inputSizeAndPosition.top + inputSizeAndPosition.height + mu;
             widgetDOM.style.left = inputSizeAndPosition.left + mu;
-            initRGBA();
+            
+            initrgb();
             setWebnameFocus();
             displayWidget();
             setValueSliderInput();
@@ -558,7 +530,7 @@ var colorPicker = (function(){
                     if(formatDOMElem === stackDOMElem){
                         formatDOMElem.style.border = border(true);
                         isAnyFormatDOMElemInStack = true;
-                        colorFormat.current = formatDOMElem.getAttribute("class");
+                        colorFormat = formatDOMElem.getAttribute("class");
                     }
                 });
             });
@@ -568,10 +540,10 @@ var colorPicker = (function(){
                 isAnyFormatDOMElemEqualToStartColor = formatsDOM[index].some(function(formatDOMElem){
                     
                     var cssClass = formatDOMElem.getAttribute("class"),
-                        isEqual = cssClass.indexOf(colorFormat.current) !== -1;
+                        isEqual = cssClass.indexOf(colorFormat) !== -1;
 
                     if(isEqual){
-                        colorFormat.current = cssClass;
+                        colorFormat = cssClass;
                         formatDOMElem.style.border = border(true);
                     }
 
@@ -580,9 +552,9 @@ var colorPicker = (function(){
                 
                 if(!isAnyFormatDOMElemEqualToStartColor){
                     
-                    colorFormatsKeys.forEach(function(colorFormat){
+                    colorFormatsKeys.forEach(function(_colorFormat){
                         formatsDOM[index].forEach(function(DOMElem){
-                            if(DOMElem.getAttribute("class").indexOf(colorFormat) !== -1){
+                            if(DOMElem.getAttribute("class").indexOf(_colorFormat) !== -1){
                                 if(!isAnyFormatDOMElemEqualToStartColor){
                                     //Эта проверка может показаться излишней, но в массиве colorFormatsKeys
                                     //совпадения со значениями атрибута class в DOM-элементах может быть более одного
@@ -590,7 +562,7 @@ var colorPicker = (function(){
                                     //Также, для большего контроля можно использовать переменную со значением
                                     //того формат, который назначается по умолчанию в случае отсутствия у способа
                                     DOMElem.style.border = border(true);
-                                    colorFormat.current = colorFormat;
+                                    colorFormat = _colorFormat;
                                     isAnyFormatDOMElemEqualToStartColor = true;
                                 }
                             }
@@ -633,7 +605,6 @@ var colorPicker = (function(){
                 stack[stack.length - 2].onmousemove = undefined;
                 stack[stack.length - 2].ondragstart = undefined;
                 currentMousemoveElem = undefined;
-                y = false;
             }
         }
 
@@ -659,10 +630,10 @@ var colorPicker = (function(){
         }
 
         //Функции вызываемые на событие клик в области content
-        //Эти функции ответственны за корректную передачу данных в saveRGBA
+        //Эти функции ответственны за корректную передачу данных в savergb
         function squareFn(stack){
                         
-            var rgbaMap = {};
+            var rgbMap = {};
 
             stack.forEach(function(item){
                 var isContainColornameData = item.hasAttribute("data-colorname");
@@ -672,21 +643,21 @@ var colorPicker = (function(){
                     this.b = item.getAttribute("data-b");
                     this.colorname = item.getAttribute("data-colorname");
                 }
-            }, rgbaMap);
+            }, rgbMap);
 
-            endupChoice(rgbaMap);
+            endupChoice(rgbMap);
         }
 
         function sliderFn(stack){
             
-            var rgbaMap = {};
+            var rgbMap = {};
 
-            rgbaInputsList.forEach(function(channel){
+            rgbInputsList.forEach(function(channel){
                 this[channel.name] = channel.value;
-            }, rgbaMap);
+            }, rgbMap);
 
             matchingElements(stack, confirmButtonsList, function(){
-                endupChoice(rgbaMap);
+                endupChoice(rgbMap);
             });
         }
         //Клик на элементе close
@@ -698,44 +669,39 @@ var colorPicker = (function(){
  */
         function createOutputValueString(){
 
-            var format = colorFormat.current;
+            var format = colorFormat;
             /**
              * Мне не особо нравится эта идея, но я на ней остановился. 
              * Возможно изначально неправильно продумана архитектура.
              */
             if(format === "webnames")
-                return rgba.colorname.toLowerCase();
+                return rgb.colorname.toLowerCase();
             
             var __p__ = String.prototype; 
 
             var startOutputStringFrom = {
                 hex: "#",
                 rgb: "rgb(",
-                rgba: "rgba("
             };
 
             var endOutputString = {
                 hex: "",
                 rgb: ")",
-                rgba: ")"
             };
 
             var delimiter = {
                 hex: "",
                 rgb: ", ",
-                rgba: ", "
             }
 
             var register = {
                 hex: __p__.toUpperCase,
                 rgb: __p__.toLowerCase,
-                rgba: __p__.toLowerCase
             }
 
             var useFnToBuildOutput = {
                 hex: function(value){ return decToHEX(value); },
                 rgb: function(value){ return +value; },
-                rgba: function(value){ return +value; }
             };
 
             var start = {
@@ -747,7 +713,7 @@ var colorPicker = (function(){
             };
 
             var returnMap = 
-                [rgba.r, rgba.g, rgba.b, rgba.a]
+                [rgb.r, rgb.g, rgb.b]
                 .slice(0, format.length)
                 .reduce(function(cur, next, idx, arr){
                     
@@ -822,14 +788,12 @@ var colorPicker = (function(){
             return returnValue;
         }
 
-        function initRGBA(){
+        function initrgb(){
 
             var value = currentInput.value,
-                regexp = /(#|(?:rgba?))((?:[a-fA-F0-9]{3,6})|(?:\s*\((?:(?:\s*\d){1,3}\s*,?\s*){3}(?:\d?\.?\d+\s*)?\)))/;
+                regexp = /(#|(?:rgb?))((?:[a-fA-F0-9]{3,6})|(?:\s*\((?:(?:\s*\d){1,3}\s*,?\s*){3}(?:\d?\.?\d+\s*)?\)))/;
             
             var result = value.match(regexp);
-
-            var defaultAlphaChannelValue = 1;
 
             if(!result){
                 var valueTrimmed = value.trim();
@@ -850,7 +814,7 @@ var colorPicker = (function(){
 
                     if(value.length === 3){
                         return {
-                            r: hexToDec(rgb[0]), g: hexToDec(rgb[1]), b: hexToDec(rgb[2]), a: defaultAlphaChannelValue
+                            r: hexToDec(rgb[0]), g: hexToDec(rgb[1]), b: hexToDec(rgb[2])
                         };
                     }
 
@@ -859,7 +823,6 @@ var colorPicker = (function(){
                             r: hexToDEC(rgb[0] + rgb[1]),
                             g: hexToDEC(rgb[2] + rgb[3]),
                             b: hexToDEC(rgb[4] + rgb[5]),
-                            a: defaultAlphaChannelValue
                         }
                     }
 
@@ -875,19 +838,7 @@ var colorPicker = (function(){
                         r: +rgb[0],
                         g: +rgb[1],
                         b: +rgb[2],
-                        a: defaultAlphaChannelValue
                     }
-                },
-                "rgba": function(value){
-                    var rgb = value.match(/\d+/g);
-                    var a = value.match(/(\d?\.?\d+)\s*\)/);
-
-                    return {
-                        r: +rgb[0],
-                        g: +rgb[1],
-                        b: +rgb[2],
-                        a: +a[1]
-                    };
                 },
                 "colorname": function(value){
 
@@ -898,25 +849,24 @@ var colorPicker = (function(){
                         r: rgb.r,
                         g: rgb.g,
                         b: rgb.b,
-                        a: defaultAlphaChannelValue,
                         colorname: valueTrimmed
                     }
                 }
             };
             
             if(result)
-                saveRGBA(componentsOfColor[result[1]](result[2]));
+                saveRGB(componentsOfColor[result[1]](result[2]));
         }
 
         function setWebnameFocus(){
 
             webnamesDOMList.forEach(function(item){
                 
-                var isEqual = rgba.colorname 
-                    ? item.getAttribute("data-colorname") === rgba.colorname
-                    : (+item.getAttribute("data-r") === rgba.r
-                    && +item.getAttribute("data-g") === rgba.g
-                    && +item.getAttribute("data-b") === rgba.b);
+                var isEqual = rgb.colorname 
+                    ? item.getAttribute("data-colorname") === rgb.colorname
+                    : (+item.getAttribute("data-r") === rgb.r
+                    && +item.getAttribute("data-g") === rgb.g
+                    && +item.getAttribute("data-b") === rgb.b);
 
                 if(isEqual){
                     item.style.boxSizing = "border-box";
@@ -931,18 +881,18 @@ var colorPicker = (function(){
         }
 
         function setValueSliderInput(){
-            rgbaInputsList.forEach(function(item){
-                var value = rgba[item.getAttribute("name")];
+            rgbInputsList.forEach(function(item){
+                var value = rgb[item.getAttribute("name")];
                 item.value = value !== undefined ? value : "0";
             });
         }
 
         function setSlidersPosition(){
             slidersList.forEach(function(itemMap){
-                if(rgba[itemMap.slider.getAttribute("data-channel")]){
+                if(rgb[itemMap.slider.getAttribute("data-channel")]){
                     var ratio = itemMap.parent.clientWidth/255;
                     itemMap.slider.style.left = 
-                        ratio * rgba[itemMap.slider.getAttribute("data-channel")] 
+                        ratio * rgb[itemMap.slider.getAttribute("data-channel")] 
                         - itemMap.slider.getBoundingClientRect().width + "px";
                 }
             });
@@ -950,54 +900,46 @@ var colorPicker = (function(){
 
         function setSliderResultValue(){
 
-            var _rgba = {r: undefined, g: undefined, b: undefined, a: undefined};
+            var _rgb = {r: undefined, g: undefined, b: undefined};
             
-            rgbaInputsList.forEach(function(input){
-                _rgba[input.name] = rgba[input.name] || input.value;
+            rgbInputsList.forEach(function(input){
+                _rgb[input.name] = rgb[input.name] || input.value;
             });
 
             sliderResultDOM.style.backgroundColor = 
-                "rgba(" + _rgba.r + ", " + _rgba.g + ", "  + _rgba.b + ", " + _rgba.a + ")";
+                "rgb(" + _rgb.r + ", " + _rgb.g + ", "  + _rgb.b + ")";
         }
 
-        function disableAlphaChannel(colorFormat){
-
-            if(colorFormat === "rgba"){
-                alphaChannelSliderDOM.style.opacity = 1;
-            } else {
-                alphaChannelSliderDOM.style.opacity = .3;
-            }
-        }
-
-        function saveRGBA(params){
+        function saveRGB(params){
             if(!params)
                 params = {};
                 
-            rgba.r = params.r;
-            rgba.g = params.g; 
-            rgba.b = params.b;
-            rgba.a = params.a; //undefined, если аргумент не передан при вызове
-            rgba.colorname = params.colorname; //undefined, если аргумент не передан при вызове
-            console.log("RGBA", rgba);
+            rgb.r = params.r;
+            rgb.g = params.g; 
+            rgb.b = params.b;
+            rgb.colorname = params.colorname; //undefined, если аргумент не передан при вызове
         }
 
         function hideWidget(){
+            
             document.removeEventListener("click", clickOutOfWidget, false);
             widgetDOM.style.display = "none";
-            inputStackDOM.forEach(function(input){input.removeAttribute("data-is-colorpicker-opened");});
+
+            inputStackDOM.forEach(function(input){
+                input.removeAttribute("data-is-colorpicker-opened");
+            });
         }
 
-        function endupChoice(rgbaMap){
+        function endupChoice(rgbMap){
 
             var hasFullData = {
-                "webnames": !!rgbaMap.colorname,
-                "hex": !!(rgbaMap.r && rgbaMap.g && rgbaMap.b),
-                "rgb": !!(rgbaMap.r && rgbaMap.g && rgbaMap.b),
-                "rgba": !!(rgbaMap.r && rgbaMap.g && rgbaMap.b && rgbaMap.a)
-            }[colorFormat.current];
+                "webnames": !!rgbMap.colorname,
+                "hex": !!(rgbMap.r && rgbMap.g && rgbMap.b),
+                "rgb": !!(rgbMap.r && rgbMap.g && rgbMap.b),
+            }[colorFormat];
 
             if(hasFullData){
-                saveRGBA(rgbaMap);
+                saveRGB(rgbMap);
                 currentInput.value = createOutputValueString();
                 hideWidget();
             } else 
