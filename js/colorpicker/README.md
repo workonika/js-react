@@ -82,7 +82,7 @@ JS. Виджет "Colorpicker"
     setWebnameFocus
     setValueSliderInput
     setSlidersPosition
-    disableAlphaChannel
+    setRGBThroughSlidersPosition
 
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker

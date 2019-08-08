@@ -359,8 +359,6 @@ var colorPicker = (function(){
             return widgetDOM.querySelector("." + cssClassesForControl.slider[index]);
         });
         
-        console.log(rgbInputsList);
-
         var slidersList = [
             {slider: 1, parent: 0}, 
             {slider: 3, parent: 2}, 
@@ -372,8 +370,6 @@ var colorPicker = (function(){
 
                 return { slider: slider, parent: parent };
         });
-
-        console.log(slidersList)
 
         var sliderResultDOM = getDOM(cssClassesForControl.slider[14]);
         
@@ -619,6 +615,9 @@ var colorPicker = (function(){
 
             t.style.left = ((deltaX >= geometryParent.width - geometryTarget.width) ? 
                     geometryParent.width - geometryTarget.width : deltaX) + "px";
+
+            setRGBThroughSlidersPosition();
+            setSliderResultValue();
         }
 
         function click(stack){
@@ -895,6 +894,19 @@ var colorPicker = (function(){
                         ratio * rgb[itemMap.slider.getAttribute("data-channel")] 
                         - itemMap.slider.getBoundingClientRect().width + "px";
                 }
+            });
+        }
+
+        function setRGBThroughSlidersPosition(){
+            slidersList.forEach(function(itemMap){
+                rgb[itemMap.slider.getAttribute("data-channel")] = 
+                    parseFloat(itemMap.slider.style.left)
+                    /(itemMap.parent.clientWidth - itemMap.slider.getBoundingClientRect().width) 
+                    * 255;
+            });
+
+            rgbInputsList.forEach(function(input){
+                input.value = parseInt(rgb[input.getAttribute("class")]);
             });
         }
 
