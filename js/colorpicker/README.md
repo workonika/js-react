@@ -46,10 +46,12 @@ JS. Виджет "Colorpicker"
     contentDOM
     contentAreaEventsHandles
     stackOfElemsForMousemoveEvent
-    rgbaInputs
+    rgbaInputsList
+    slidersList
 
 Функции определенные внутри bindEventListeners
 --------------------------
+    getDOM
     getNestedElems
     getDeepNestedElems
     matchingElements
@@ -79,6 +81,8 @@ JS. Виджет "Colorpicker"
     endupChoice
     setWebnameFocus
     setValueSliderInput
+    setSlidersPosition
+    disableAlphaChannel
 
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker

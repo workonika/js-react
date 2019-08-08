@@ -106,8 +106,8 @@ var colorPicker = (function(){
         var cssClassesForControl = {
                 area: ["way-of-getting-color", "color-formats", "content-of-way"],
                 square: ["webnames", "rgb", "webname-value"],
-                slider: ["parent-red", "slide-red", "parent-green", "slide-green", "parent-blue", 
-                        "slide-blue", "slide-input", "r", "g", "b", "a", "confirm-button"]
+                slider: ["parent-r", "r", "parent-g", "g", "parent-b", "b", 
+                "slide-input", "r", "g", "b", "a", "confirm-button", "parent-a", "a", "slider-result"]
             },
             waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
             startWayName = "square",
@@ -273,14 +273,14 @@ var colorPicker = (function(){
                 + createSlide(this.cssClasses[0], this.cssClasses[1], "#e03232")
                 + createSlide(this.cssClasses[2], this.cssClasses[3], "#2f902f")
                 + createSlide(this.cssClasses[4], this.cssClasses[5], "#3d3d9e")
-                + createSlide() + "</div>";
+                + createSlide(this.cssClasses[12], this.cssClasses[13], "linear-gradient(to right, black, white);") + "</div>";
 
             innerHTML += "<div style='display: inline-block; width: 18%;'>" 
                 + createInput(this.cssClasses[6], this.cssClasses[7], "r") 
                 + createInput(this.cssClasses[6], this.cssClasses[8], "g") 
                 + createInput(this.cssClasses[6], this.cssClasses[9], "b") 
                 + createInput(this.cssClasses[6], this.cssClasses[10], "a") + "</div>";
-            innerHTML += createResult("this.cssClasses[5]", this.cssClasses[11]);
+            innerHTML += createResult(this.cssClasses[14], this.cssClasses[11]);
 
         return innerHTML;
     }
@@ -296,10 +296,10 @@ var colorPicker = (function(){
             + "</div>";
     }
 
-    function createSlide(parent, slide, color){
+    function createSlide(parent, slide, color, isAlphaChannel){
         return "<div class='" + parent + "' style='position: relative; width: 98%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
-                + "<div class='" + slide + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
-                + "<div style='margin-top:4px; width: 100%; height: 20px; box-sizing: border-box; border: 1px solid grey; background-color:" + color + ";'></div>"
+                + "<div data-channel='" + slide + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
+                + "<div style='margin-top:4px; width: 100%; height: 20px; box-sizing: border-box; border: 1px solid grey; background:" + color + ";'></div>"
             + "</div>"
     }
 
@@ -334,7 +334,6 @@ var colorPicker = (function(){
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             colorFormatsKeys = p.colorFormatsKeys,
             startWayName = p.startWayName,
-            startColorFormat = p.startColorFormat,
             colorNames = p.colorNames,
             colorNamesList = Object.keys(colorNames),
             commonColorFormatByDefault = "", //Нужно ли это?
@@ -345,7 +344,21 @@ var colorPicker = (function(){
 
         var oneWayDifferrentAreas, 
             squareDOMList,
-            sliderDOMList; 
+            sliderDOMList;
+
+        var colorFormat = {
+            value: p.startColorFormat,
+            set current (value){
+                disableAlphaChannel(value);
+                this.vlaue = value;
+            },
+            get current (){
+                disableAlphaChannel(this.value);
+                return this.value;
+            },
+        };
+
+        window.colorFormat = colorFormat;
 
         oneWayDifferrentAreas = [squareDOMList, sliderDOMList];
 
@@ -360,40 +373,39 @@ var colorPicker = (function(){
             contentDOM = getNestedElems(cssClassesForControl.area[2]);
 
         var contentAreaEventsHandles = [squareFn, sliderFn];
-        /**
-         * @todo В связи с отсутствием необходимости вычисления значений координат по оси Y 
-         * пересмотреть эту структуры данных
-         */
-        var stackOfElemsForMousemoveEvent = [
-                { 
-                    cssClass: cssClassesForControl.slider[1], 
-                    y: false 
-                },
-                { 
-                    cssClass: cssClassesForControl.slider[3], 
-                    y: false 
-                },
-                { 
-                    cssClass: cssClassesForControl.slider[5], 
-                    y: false 
-                }
-            ].map(function(obj){
-                return { DOM: widgetDOM.querySelector("." + obj.cssClass), y: obj.y };
-            });
-
+        
         /**
          * @todo В связи с отсутствием необходимости вычисления значений координат по оси Y 
          * пересмотреть эти переменные
          */
-        var currentMousemoveElem,
-            y = false;
+        var currentMousemoveElem;
         /**
          * @todo На этапе рефакторинга: 1) переименовать 2) убрать индексы - сделать ссылки на классы
          */
-        var rgbaInputs = [7, 8, 9, 10].map(function(index){
+        var rgbaInputsList = [7, 8, 9, 10].map(function(index){
             return widgetDOM.querySelector("." + cssClassesForControl.slider[index]);
         });
 
+        var slidersList = [
+            {slider: 1, parent: 0}, 
+            {slider: 3, parent: 2}, 
+            {slider: 5, parent: 4}, 
+            {slider: 13, parent: 12}
+        ].map(function(obj){
+            var css = cssClassesForControl.slider,
+                slider =  widgetDOM.querySelector("[data-channel='" + css[obj.slider] + "']"),
+                parent = getDOM(css[obj.parent]);
+
+                return { slider: slider, parent: parent };
+        });
+
+        var alphaChannelSliderDOM = widgetDOM.querySelector("[data-channel='" + cssClassesForControl.slider[13] + "']");
+
+        console.log(rgbaInputsList);
+        console.log(slidersList);
+
+        var sliderResultDOM = getDOM(cssClassesForControl.slider[14]);
+        
         var confirmButtonsList = [cssClassesForControl.slider[11], ].map(function(cssClass){
             return widgetDOM.querySelector("." + cssClass);
         });
@@ -412,6 +424,10 @@ var colorPicker = (function(){
         ["click", "mousedown", "mouseup"].forEach(function(eventType){
             widgetDOM.addEventListener(eventType, widgetEventsHandler, false);
         });
+
+        function getDOM(cssClass){
+            return widgetDOM.querySelector("." + cssClass);
+        }
 
         function getNestedElems(cssClass){
             var _widgetDOM = widgetDOM.querySelector("." + cssClass);
@@ -466,8 +482,9 @@ var colorPicker = (function(){
             widgetDOM.style.left = inputSizeAndPosition.left + mu;
             initRGBA();
             setWebnameFocus();
-            setValueSliderInput();
             displayWidget();
+            setValueSliderInput();
+            setSlidersPosition();
         }
         //События на colorpicker
         /**
@@ -521,6 +538,8 @@ var colorPicker = (function(){
             });
 
             chooseFormat(stack);
+            setSliderResultValue();
+            setSlidersPosition();
         }
 
         function chooseFormat(stack){
@@ -539,7 +558,7 @@ var colorPicker = (function(){
                     if(formatDOMElem === stackDOMElem){
                         formatDOMElem.style.border = border(true);
                         isAnyFormatDOMElemInStack = true;
-                        startColorFormat = formatDOMElem.getAttribute("class");
+                        colorFormat.current = formatDOMElem.getAttribute("class");
                     }
                 });
             });
@@ -549,10 +568,10 @@ var colorPicker = (function(){
                 isAnyFormatDOMElemEqualToStartColor = formatsDOM[index].some(function(formatDOMElem){
                     
                     var cssClass = formatDOMElem.getAttribute("class"),
-                        isEqual = cssClass.indexOf(startColorFormat) !== -1;
+                        isEqual = cssClass.indexOf(colorFormat.current) !== -1;
 
                     if(isEqual){
-                        startColorFormat = cssClass;
+                        colorFormat.current = cssClass;
                         formatDOMElem.style.border = border(true);
                     }
 
@@ -571,20 +590,18 @@ var colorPicker = (function(){
                                     //Также, для большего контроля можно использовать переменную со значением
                                     //того формат, который назначается по умолчанию в случае отсутствия у способа
                                     DOMElem.style.border = border(true);
-                                    startColorFormat = colorFormat;
+                                    colorFormat.current = colorFormat;
                                     isAnyFormatDOMElemEqualToStartColor = true;
                                 }
                             }
                         });
                     });
                 }
-            } 
+            }
         }
 
         function getValue(stack, eventType){
             
-        console.log("stackOfElemsForMousemoveEvent", stackOfElemsForMousemoveEvent);
-
             //currentInput.value = startValue;
             
             switch(eventType){
@@ -597,10 +614,9 @@ var colorPicker = (function(){
         function mousedown(stack){
 
             stack.forEach(function(arr1DOMElem){
-                stackOfElemsForMousemoveEvent.forEach(function(arr2DOMElem){
-                    if(arr1DOMElem === arr2DOMElem.DOM){
-                        currentMousemoveElem = arr2DOMElem.DOM;
-                        y = arr2DOMElem.y;
+                slidersList.forEach(function(arr2DOMElem){
+                    if(arr1DOMElem === arr2DOMElem.slider){
+                        currentMousemoveElem = arr2DOMElem.slider;
                     }
                 });
             });
@@ -665,7 +681,7 @@ var colorPicker = (function(){
             
             var rgbaMap = {};
 
-            rgbaInputs.forEach(function(channel){
+            rgbaInputsList.forEach(function(channel){
                 this[channel.name] = channel.value;
             }, rgbaMap);
 
@@ -682,7 +698,7 @@ var colorPicker = (function(){
  */
         function createOutputValueString(){
 
-            var format = startColorFormat;
+            var format = colorFormat.current;
             /**
              * Мне не особо нравится эта идея, но я на ней остановился. 
              * Возможно изначально неправильно продумана архитектура.
@@ -806,16 +822,14 @@ var colorPicker = (function(){
             return returnValue;
         }
 
-        function validation(format, value){
-            //В будущих версиях нужно сделать валидацию данных вносимых в input
-        }
-
         function initRGBA(){
 
             var value = currentInput.value,
                 regexp = /(#|(?:rgba?))((?:[a-fA-F0-9]{3,6})|(?:\s*\((?:(?:\s*\d){1,3}\s*,?\s*){3}(?:\d?\.?\d+\s*)?\)))/;
             
             var result = value.match(regexp);
+
+            var defaultAlphaChannelValue = 1;
 
             if(!result){
                 var valueTrimmed = value.trim();
@@ -836,7 +850,7 @@ var colorPicker = (function(){
 
                     if(value.length === 3){
                         return {
-                            r: hexToDec(rgb[0]), g: hexToDec(rgb[1]), b: hexToDec(rgb[2])
+                            r: hexToDec(rgb[0]), g: hexToDec(rgb[1]), b: hexToDec(rgb[2]), a: defaultAlphaChannelValue
                         };
                     }
 
@@ -844,7 +858,8 @@ var colorPicker = (function(){
                         return {
                             r: hexToDEC(rgb[0] + rgb[1]),
                             g: hexToDEC(rgb[2] + rgb[3]),
-                            b: hexToDEC(rgb[4] + rgb[5])
+                            b: hexToDEC(rgb[4] + rgb[5]),
+                            a: defaultAlphaChannelValue
                         }
                     }
 
@@ -859,7 +874,8 @@ var colorPicker = (function(){
                     return {
                         r: +rgb[0],
                         g: +rgb[1],
-                        b: +rgb[2]
+                        b: +rgb[2],
+                        a: defaultAlphaChannelValue
                     }
                 },
                 "rgba": function(value){
@@ -882,6 +898,7 @@ var colorPicker = (function(){
                         r: rgb.r,
                         g: rgb.g,
                         b: rgb.b,
+                        a: defaultAlphaChannelValue,
                         colorname: valueTrimmed
                     }
                 }
@@ -914,10 +931,42 @@ var colorPicker = (function(){
         }
 
         function setValueSliderInput(){
-            rgbaInputs.forEach(function(item){
+            rgbaInputsList.forEach(function(item){
                 var value = rgba[item.getAttribute("name")];
-                item.value = value !== undefined ? value : "";
+                item.value = value !== undefined ? value : "0";
             });
+        }
+
+        function setSlidersPosition(){
+            slidersList.forEach(function(itemMap){
+                if(rgba[itemMap.slider.getAttribute("data-channel")]){
+                    var ratio = itemMap.parent.clientWidth/255;
+                    itemMap.slider.style.left = 
+                        ratio * rgba[itemMap.slider.getAttribute("data-channel")] 
+                        - itemMap.slider.getBoundingClientRect().width + "px";
+                }
+            });
+        }
+
+        function setSliderResultValue(){
+
+            var _rgba = {r: undefined, g: undefined, b: undefined, a: undefined};
+            
+            rgbaInputsList.forEach(function(input){
+                _rgba[input.name] = rgba[input.name] || input.value;
+            });
+
+            sliderResultDOM.style.backgroundColor = 
+                "rgba(" + _rgba.r + ", " + _rgba.g + ", "  + _rgba.b + ", " + _rgba.a + ")";
+        }
+
+        function disableAlphaChannel(colorFormat){
+
+            if(colorFormat === "rgba"){
+                alphaChannelSliderDOM.style.opacity = 1;
+            } else {
+                alphaChannelSliderDOM.style.opacity = .3;
+            }
         }
 
         function saveRGBA(params){
@@ -940,12 +989,19 @@ var colorPicker = (function(){
 
         function endupChoice(rgbaMap){
 
-            if(!rgbaMap.r && !rgbaMap.g && !rgbaMap.b)
+            var hasFullData = {
+                "webnames": !!rgbaMap.colorname,
+                "hex": !!(rgbaMap.r && rgbaMap.g && rgbaMap.b),
+                "rgb": !!(rgbaMap.r && rgbaMap.g && rgbaMap.b),
+                "rgba": !!(rgbaMap.r && rgbaMap.g && rgbaMap.b && rgbaMap.a)
+            }[colorFormat.current];
+
+            if(hasFullData){
+                saveRGBA(rgbaMap);
+                currentInput.value = createOutputValueString();
+                hideWidget();
+            } else 
                 return false;
-            
-            saveRGBA(rgbaMap);
-            currentInput.value = createOutputValueString();
-            hideWidget();
         }
 
         function displayWidget(){
