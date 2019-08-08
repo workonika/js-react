@@ -94,6 +94,7 @@ var colorPicker = (function(){
         });
 
         var cssClassesForControl = {
+                widget: ["colorpicker", "close"],
                 area: ["way-of-getting-color", "color-formats", "content-of-way"],
                 square: ["webnames", "rgb", "webname-value"],
                 slider: ["parent-r", "r", "parent-g", "g", "parent-b", "b", 
@@ -162,21 +163,11 @@ var colorPicker = (function(){
     function createWidgetDOMElement(params){
         
         var p = params, 
-            div = document.createElement("div"),
-            mu = "px";
+            div = document.createElement("div");
 
-        div.style.position = "absolute";
-        div.style.width = p.widgetSize.width + mu;
-        div.style.height = p.widgetSize.height + mu;
-        div.style.border = "1px solid #aaabaa";
-        div.style.display = "none";
-        div.style.fontFamily = "sans-serif";
-        div.style.fontSize = ".8em";
-        div.style.marginTop = "2px";
-        div.style.padding = "5px";
-        div.style.color = "#4e4d4d";
+            div.setAttribute("class", p.cssClassesForControl.widget[0]);
 
-        var innerHTML = { innerHTML: "<div style='position: absolute; width: 20px; height: 20px; right: 0; rotate: 45deg; font-size: 1.4em' class='close'>&times;</div>", },
+        var innerHTML = { innerHTML: "<div class=" + p.cssClassesForControl.widget[1] + ">&times;</div>", },
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             cssClassesForControl = p.cssClassesForControl,
             matchFormatToMethod = p.matchFormatToMethod,
