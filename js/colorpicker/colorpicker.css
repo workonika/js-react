@@ -1,3 +1,21 @@
 .colorpicker {
-    
+    position: absolute;
+    width: 350px;
+    height: 300px;
+    border: 1px solid rgb(170, 171, 170);
+    display: block;
+    font-family: sans-serif;
+    font-size: 0.8em;
+    margin-top: 2px;
+    padding: 5px;
+    color: rgb(78, 77, 77);
+}
+
+.close {
+    position: absolute; 
+    width: 20px; 
+    height: 20px; 
+    right: 0;
+    font-size: 1.4em;
+    cursor: pointer;
 }
