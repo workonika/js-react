@@ -63,6 +63,22 @@ var colorPicker = (function(){
             ],
         };
 
+        var cssForControl = {
+            widget: { colorpicker: "colorpicker", close: "close"},
+            zones: { way: "way-of-getting-color", format: "color-formats", content: "content-of-way"},
+            square: { webnames: "webnames", rgb: "rgb", value: "webname-value" },
+            slider: {
+                r: "r", g: "g", b: "b",
+                parentR: "parent-r", parentG: "parent-g", parentB: "parent-b",
+                pathR: "path-r", pathG: "path-g", pathB: "path-b",
+                inputs: "inputs", slideInput: "slide-input", confirm: "confirm-button", slide: "slide", 
+                result: "result", resultText: "result-text", choosed: "slider-result"
+            },
+            present: {
+                hide: "hide", border: "border", displayBlock: "display-block", displayInlineBlock: "display-inline-block"
+            }
+        };
+
         var colorNames = JSON.parse('{"stack":[{"groupName":"Красные","colors":[{"name":"indianred","dec":{"r":205,"g":92,"b":92}},{"name":"lightcoral","dec":{"r":240,"g":128,"b":128}},{"name":"salmon","dec":{"r":250,"g":128,"b":114}},{"name":"darksalmon","dec":{"r":233,"g":150,"b":122}},{"name":"lightsalmon","dec":{"r":255,"g":160,"b":122}},{"name":"crimson","dec":{"r":220,"g":20,"b":60}},{"name":"red","dec":{"r":255,"g":0,"b":0}},{"name":"firebrick","dec":{"r":178,"g":34,"b":34}},{"name":"darkred","dec":{"r":139,"g":0,"b":0}}]},{"groupName":"Розовые","colors":[{"name":"pink","dec":{"r":255,"g":192,"b":203}},{"name":"lightpink","dec":{"r":255,"g":182,"b":193}},{"name":"hotpink","dec":{"r":255,"g":105,"b":180}},{"name":"deeppink","dec":{"r":255,"g":20,"b":147}},{"name":"mediumvioletred","dec":{"r":199,"g":21,"b":133}},{"name":"palevioletred","dec":{"r":219,"g":112,"b":147}}]},{"groupName":"Оранжевые","colors":[{"name":"coral","dec":{"r":255,"g":127,"b":80}},{"name":"tomato","dec":{"r":255,"g":99,"b":71}},{"name":"orangered","dec":{"r":255,"g":69,"b":0}},{"name":"darkorange","dec":{"r":255,"g":140,"b":0}},{"name":"orange","dec":{"r":255,"g":165,"b":0}}]},{"groupName":"Жёлтые","colors":[{"name":"gold","dec":{"r":255,"g":215,"b":0}},{"name":"yellow","dec":{"r":255,"g":255,"b":0}},{"name":"lightyellow","dec":{"r":255,"g":255,"b":224}},{"name":"lemonchiffon","dec":{"r":255,"g":250,"b":205}},{"name":"lightgoldenrodyellow","dec":{"r":250,"g":250,"b":210}},{"name":"papayawhip","dec":{"r":255,"g":239,"b":213}},{"name":"moccasin","dec":{"r":255,"g":228,"b":181}},{"name":"peachpuff","dec":{"r":255,"g":218,"b":185}},{"name":"palegoldenrod","dec":{"r":238,"g":232,"b":170}},{"name":"khaki","dec":{"r":240,"g":230,"b":140}},{"name":"darkkhaki","dec":{"r":189,"g":183,"b":107}}]},{"groupName":"Фиолетовые","colors":[{"name":"lavender","dec":{"r":230,"g":230,"b":250}},{"name":"thistle","dec":{"r":216,"g":191,"b":216}},{"name":"plum","dec":{"r":221,"g":160,"b":221}},{"name":"violet","dec":{"r":238,"g":130,"b":238}},{"name":"orchid","dec":{"r":218,"g":112,"b":214}},{"name":"fuchsia","dec":{"r":255,"g":0,"b":255}},{"name":"mediumorchid","dec":{"r":186,"g":85,"b":211}},{"name":"mediumpurple","dec":{"r":147,"g":112,"b":219}},{"name":"blueviolet","dec":{"r":138,"g":43,"b":226}},{"name":"darkviolet","dec":{"r":148,"g":0,"b":211}},{"name":"darkorchid","dec":{"r":153,"g":50,"b":204}},{"name":"darkmagenta","dec":{"r":139,"g":0,"b":139}},{"name":"purple","dec":{"r":128,"g":0,"b":128}},{"name":"indigo","dec":{"r":75,"g":0,"b":130}},{"name":"slateblue","dec":{"r":106,"g":90,"b":205}},{"name":"darkslateblue","dec":{"r":72,"g":61,"b":139}}]},{"groupName":"Зелёные","colors":[{"name":"greenyellow","dec":{"r":173,"g":255,"b":47}},{"name":"chartreuse","dec":{"r":127,"g":255,"b":0}},{"name":"lawngreen","dec":{"r":124,"g":252,"b":0}},{"name":"lime","dec":{"r":0,"g":255,"b":0}},{"name":"limegreen","dec":{"r":50,"g":205,"b":50}},{"name":"palegreen","dec":{"r":152,"g":251,"b":152}},{"name":"lightgreen","dec":{"r":144,"g":238,"b":144}},{"name":"mediumspringgreen","dec":{"r":0,"g":250,"b":154}},{"name":"springgreen","dec":{"r":0,"g":255,"b":127}},{"name":"mediumseagreen","dec":{"r":60,"g":179,"b":113}},{"name":"seagreen","dec":{"r":46,"g":139,"b":87}},{"name":"forestgreen","dec":{"r":34,"g":139,"b":34}},{"name":"green","dec":{"r":0,"g":128,"b":0}},{"name":"darkgreen","dec":{"r":0,"g":100,"b":0}},{"name":"yellowgreen","dec":{"r":154,"g":205,"b":50}},{"name":"olivedrab","dec":{"r":107,"g":142,"b":35}},{"name":"olive","dec":{"r":128,"g":128,"b":0}},{"name":"darkolivegreen","dec":{"r":85,"g":107,"b":47}},{"name":"mediumaquamarine","dec":{"r":102,"g":205,"b":170}},{"name":"darkseagreen","dec":{"r":143,"g":188,"b":143}},{"name":"lightseagreen","dec":{"r":32,"g":178,"b":170}},{"name":"darkcyan","dec":{"r":0,"g":139,"b":139}},{"name":"teal","dec":{"r":0,"g":128,"b":128}}]},{"groupName":"Синие","colors":[{"name":"aqua","dec":{"r":0,"g":255,"b":255}},{"name":"lightcyan","dec":{"r":224,"g":255,"b":255}},{"name":"paleturquoise","dec":{"r":175,"g":238,"b":238}},{"name":"aquamarine","dec":{"r":127,"g":255,"b":212}},{"name":"turquoise","dec":{"r":64,"g":224,"b":208}},{"name":"mediumturquoise","dec":{"r":72,"g":209,"b":204}},{"name":"darkturquoise","dec":{"r":0,"g":206,"b":209}},{"name":"cadetblue","dec":{"r":95,"g":158,"b":160}},{"name":"steelblue","dec":{"r":70,"g":130,"b":180}},{"name":"lightsteelblue","dec":{"r":176,"g":196,"b":222}},{"name":"powderblue","dec":{"r":176,"g":224,"b":230}},{"name":"lightblue","dec":{"r":173,"g":216,"b":230}},{"name":"skyblue","dec":{"r":135,"g":206,"b":235}},{"name":"lightskyblue","dec":{"r":135,"g":206,"b":250}},{"name":"deepskyblue","dec":{"r":0,"g":191,"b":255}},{"name":"dodgerblue","dec":{"r":30,"g":144,"b":255}},{"name":"cornflowerblue","dec":{"r":100,"g":149,"b":237}},{"name":"mediumslateblue","dec":{"r":123,"g":104,"b":238}},{"name":"royalblue","dec":{"r":65,"g":105,"b":225}},{"name":"blue","dec":{"r":0,"g":0,"b":255}},{"name":"mediumblue","dec":{"r":0,"g":0,"b":205}},{"name":"darkblue","dec":{"r":0,"g":0,"b":139}},{"name":"navy","dec":{"r":0,"g":0,"b":128}},{"name":"midnightblue","dec":{"r":25,"g":25,"b":112}}]},{"groupName":"Коричневые","colors":[{"name":"cornsilk","dec":{"r":255,"g":248,"b":220}},{"name":"blanchedalmond","dec":{"r":255,"g":235,"b":205}},{"name":"bisque","dec":{"r":255,"g":228,"b":196}},{"name":"navajowhite","dec":{"r":255,"g":222,"b":173}},{"name":"wheat","dec":{"r":245,"g":222,"b":179}},{"name":"burlywood","dec":{"r":222,"g":184,"b":135}},{"name":"tan","dec":{"r":210,"g":180,"b":140}},{"name":"rosybrown","dec":{"r":188,"g":143,"b":143}},{"name":"sandybrown","dec":{"r":244,"g":164,"b":96}},{"name":"goldenrod","dec":{"r":218,"g":165,"b":32}},{"name":"darkgoldenrod","dec":{"r":184,"g":134,"b":11}},{"name":"peru","dec":{"r":205,"g":133,"b":63}},{"name":"chocolate","dec":{"r":210,"g":105,"b":30}},{"name":"saddlebrown","dec":{"r":139,"g":69,"b":19}},{"name":"sienna","dec":{"r":160,"g":82,"b":45}},{"name":"brown","dec":{"r":165,"g":42,"b":42}},{"name":"maroon","dec":{"r":128,"g":0,"b":0}}]},{"groupName":"Белые","colors":[{"name":"white","dec":{"r":255,"g":255,"b":255}},{"name":"snow","dec":{"r":255,"g":250,"b":250}},{"name":"honeydew","dec":{"r":240,"g":255,"b":240}},{"name":"mintcream","dec":{"r":245,"g":255,"b":250}},{"name":"azure","dec":{"r":240,"g":255,"b":255}},{"name":"aliceblue","dec":{"r":240,"g":248,"b":255}},{"name":"ghostwhite","dec":{"r":248,"g":248,"b":255}},{"name":"whitesmoke","dec":{"r":245,"g":245,"b":245}},{"name":"seashell","dec":{"r":255,"g":245,"b":238}},{"name":"beige","dec":{"r":245,"g":245,"b":220}},{"name":"oldlace","dec":{"r":253,"g":245,"b":230}},{"name":"floralwhite","dec":{"r":255,"g":250,"b":240}},{"name":"ivory","dec":{"r":255,"g":255,"b":240}},{"name":"antiquewhite","dec":{"r":250,"g":235,"b":215}},{"name":"linen","dec":{"r":250,"g":240,"b":230}},{"name":"lavenderblush","dec":{"r":255,"g":240,"b":245}},{"name":"mistyrose","dec":{"r":255,"g":228,"b":225}}]}]}');
         colorNames = colorNames.stack;
 
@@ -83,7 +99,6 @@ var colorPicker = (function(){
             return undefined;
         }
 
-        //Элементам input назначается событие клик, при клике на котором появляется colorPicker
         inputStackDOM.forEach(function(input){
 
             var position = getComputedStyle(input).getPropertyValue("position");
@@ -93,13 +108,7 @@ var colorPicker = (function(){
             }
         });
 
-        var cssClassesForControl = {
-                widget: ["colorpicker", "close"],
-                area: ["way-of-getting-color", "color-formats", "content-of-way"],
-                square: ["webnames", "rgb", "webname-value"],
-                slider: ["parent-r", "r", "parent-g", "g", "parent-b", "b", 
-                "slide-input", "r", "g", "b", "a", "confirm-button", "parent-a", "a", "slider-result"]
-            },
+        var 
             waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
             startWayName = "square",
             startColorFormat = "hex";
@@ -110,7 +119,7 @@ var colorPicker = (function(){
             matchFormatToMethod: matchFormatToMethod, 
             lang: lang,
             colorFormats: colorFormats,
-            cssClassesForControl: cssClassesForControl,
+            cssForControl: cssForControl,
             waysOfGettingColorKeys: waysOfGettingColorKeys,
             startWayName: startWayName,
             startColorFormat: startColorFormat,
@@ -124,7 +133,7 @@ var colorPicker = (function(){
             widgetDOM: widgetDOM,
             inputStackDOM: inputStackDOM,
             getInputSizeAndPosition: getInputSizeAndPosition,
-            cssClassesForControl: cssClassesForControl,
+            cssForControl: cssForControl,
             waysOfGettingColorKeys: waysOfGettingColorKeys,
             colorFormatsKeys: Object.keys(colorFormats[lang]),
             startWayName: startWayName,
@@ -163,25 +172,25 @@ var colorPicker = (function(){
     function createWidgetDOMElement(params){
         
         var p = params, 
-            div = document.createElement("div");
+            div = document.createElement("div"),
+            css = p.cssForControl;
 
-            div.setAttribute("class", p.cssClassesForControl.widget[0]);
+            div.setAttribute("class", css.widget.colorpicker);
 
-        var innerHTML = { innerHTML: "<div class=" + p.cssClassesForControl.widget[1] + ">&times;</div>", },
+        var innerHTML = { innerHTML: "<div class=" + css.widget.close + ">&times;</div>", },
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
-            cssClassesForControl = p.cssClassesForControl,
             matchFormatToMethod = p.matchFormatToMethod,
             colorFormats = p.colorFormats;
 
         var contentMap = {
-            square: buildSquare.bind({cssClasses: cssClassesForControl.square, colors: p.colorNames, size: {width: 20, height: 20}}),
-            slider: buildSlider.bind({cssClasses: cssClassesForControl.slider}),
+            square: buildSquare.bind({css: css.square, colors: p.colorNames, }),
+            slider: buildSlider.bind({css: css.slider}),
         };
         
         var widgetAreaMap = {
             "way-of-getting-color" : function(curr, next){
                 return curr + "<div class='" + next + "' title='" 
-                    + p.wayOfGettingColor[p.lang][next].name + "' style='display: inline-block; margin-right: 15px; border:" 
+                    + p.wayOfGettingColor[p.lang][next].name + "' style='border:" 
                     + border(next === p.startWayName) + "'>"
                     + p.wayOfGettingColor[p.lang][next].name + "</div>";
             },
@@ -213,9 +222,11 @@ var colorPicker = (function(){
             return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
         });
 
-        cssClassesForControl.area.forEach(function(cssClass){
+        Object.keys(css.zones).forEach(function(zone){
             
-            this.innerHTML += "<div class='" + cssClass + "' style='margin-top: 20px;'>" +
+            var cssClass = css.zones[zone];
+
+            this.innerHTML += "<div class='" + cssClass + "'>" +
                 
                 waysOfGettingColorKeys.reduce(widgetAreaMap[cssClass], "")
                 
@@ -235,9 +246,8 @@ var colorPicker = (function(){
             //innerHTML += "<div>" + colorGroup.groupName + "</div>";
             //При необходимости можно выводить имена групп цветов - тогда нужно расскомментировать предыдущую строку
             colorGroup.colors.forEach(function(color){
-                innerHTML += "<div class='" + this.cssClasses[2] + "' style='width:" + this.size.width + "px; height:" 
-                    + this.size.height + "px; background:" 
-                    + color.name + "; display: inline-block;' data-colorname='" + color.name 
+                innerHTML += "<div class='" + this.css.value + "' style='background:" + color.name 
+                    + "' data-colorname='" + color.name 
                     + "' title='" + color.name + " rgb(" + color.dec.r + ", " + color.dec.g + ", " + color.dec.b + ")'"
                     + "' data-r='" + color.dec.r + "' data-g='" + color.dec.g + "' data-b='" + color.dec.b + "'>"
                     + "</div>";
@@ -250,45 +260,39 @@ var colorPicker = (function(){
     function buildSlider(){
         var innerHTML = "";
 
-            innerHTML += "<div style='display: inline-block; width: 80%;'>" 
-                + createSlide(this.cssClasses[0], this.cssClasses[1], "#e03232")
-                + createSlide(this.cssClasses[2], this.cssClasses[3], "#2f902f")
-                + createSlide(this.cssClasses[4], this.cssClasses[5], "#3d3d9e") + "</div>";
+            innerHTML += "<div class='" + this.css.slide + "'>"
+                + createSlide(this.css.parentR, this.css.r, this.css.pathR)
+                + createSlide(this.css.parentG, this.css.g, this.css.pathG)
+                + createSlide(this.css.parentB, this.css.b, this.css.pathB) + "</div>";
 
-            innerHTML += "<div style='display: inline-block; width: 18%;'>" 
-                + createInput(this.cssClasses[6], this.cssClasses[7], "r") 
-                + createInput(this.cssClasses[6], this.cssClasses[8], "g") 
-                + createInput(this.cssClasses[6], this.cssClasses[9], "b") + "</div>";
+            innerHTML += "<div class='" + this.css.inputs + "'>" 
+                + createInput(this.css.slideInput, this.css.r) 
+                + createInput(this.css.slideInput, this.css.g) 
+                + createInput(this.css.slideInput, this.css.b) + "</div>";
 
-            innerHTML += createResult(this.cssClasses[14], this.cssClasses[11]);
+            innerHTML += createResult(this.css.result, this.css.resultText, this.css.choosed, this.css.confirm);
 
         return innerHTML;
     }
 
-    function createResult(first, second){
-        return "<div style='border-top:1px solid transparent; margin-top: 5px;'>"
-                + "<div style='display: inline-block; vertical-align: top; margin: 12px 10px 0 0;'>Результат:</div>"
-                + "<div class='" + first + "' style='display:inline-block; width: 40px; \
-                height: 40px; border-radius: 100%; border: 1px solid black'></div>"
-                + "<button class='" + second + "' style='display: inline-block;\
-                    vertical-align: top; margin: 4px 0 0 44px; background-color: inherit;\
-                    border: 1px solid rgb(170, 171, 170); color: rgb(88, 90, 88); padding: 8px;'>Выбрать этот цвет</button>"
+    function createResult(result, result_text, choosed_result, confirm){
+        return "<div class='" + result + "'>"
+                + "<div class='" + result_text + "'>Результат:</div>"
+                + "<div class='" + choosed_result + "'></div>"
+                + "<button class='" + confirm + "'>Выбрать этот цвет</button>"
             + "</div>";
     }
 
-    function createSlide(parent, slide, color){
-        return "<div class='" + parent + "' style='position: relative; width: 98%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
-                + "<div data-channel='" + slide + "' style='position: absolute; width: 7px; height: 28px; border: 1px solid black; left: 0; top: 0'></div>"
-                + "<div style='margin-top:4px; width: 100%; height: 20px; box-sizing: border-box; border: 1px solid grey; background:" + color + ";'></div>"
+    function createSlide(parent, slide, path){
+        return "<div class='" + parent + "'>"
+                + "<div data-channel='" + slide + "' class='" + slide + "'></div>"
+                + "<div class='" + path + "'></div>"
             + "</div>"
     }
 
-    function createInput(first, second, name){
-        return "<div class='" + first 
-                + "' style='position: relative; width: 100%; height: 30px; border-top: 1px solid transparent; margin-bottom: 5px;'>"
-                + "<input name='" + name
-                + "' class='" + second 
-                + "' style='position: absolute; width: 100%; height: 28px; border: 1px solid black; left: 0; top: 0' />"
+    function createInput(container, input){
+        return "<div class='" + container + "'>"
+                + "<input name='" + input + "' class='" + input + "' />"
             + "</div>"
     }
 
@@ -310,7 +314,7 @@ var colorPicker = (function(){
             widgetDOM = p.widgetDOM,
             inputStackDOM = p.inputStackDOM,
             getInputSizeAndPosition = p.getInputSizeAndPosition,
-            cssClassesForControl = p.cssClassesForControl,
+            css = p.cssForControl,
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             colorFormat = p.startColorFormat,
             colorFormatsKeys = p.colorFormatsKeys,
@@ -331,54 +335,45 @@ var colorPicker = (function(){
             return [].slice.call(widgetDOM.querySelectorAll("." + cssClass));
         });
 
-        //oneAreaDifferentWays
-        //Нет никакого смысла запихивать в массив, так как formats уже является двумерным массивом
-        var formatsDOM = getDeepNestedElems(cssClassesForControl.area[1]),
-            contentDOM = getNestedElems(cssClassesForControl.area[2]);
-
+        var formatsDOM = getDeepNestedElems(css.zones.format),
+            contentDOM = getNestedElems(css.zones.content);
+            
         var contentAreaEventsHandles = [squareFn, sliderFn];
-        
-        /**
-         * @todo В связи с отсутствием необходимости вычисления значений координат по оси Y 
-         * пересмотреть эти переменные
-         */
+       
         var currentMousemoveElem;
-        /**
-         * @todo На этапе рефакторинга: 1) переименовать 2) убрать индексы - сделать ссылки на классы
-         */
-        var rgbInputsList = [7, 8, 9].map(function(index){
-            return widgetDOM.querySelector("." + cssClassesForControl.slider[index]);
-        });
         
+        var rgbInputsList = [css.slider.r, css.slider.g, css.slider.b].map(function(name){
+            return widgetDOM.querySelector("[name='" + name + "']");
+        });
+   
         var slidersList = [
-            {slider: 1, parent: 0}, 
-            {slider: 3, parent: 2}, 
-            {slider: 5, parent: 4},
+            { slider: css.slider.r, parent: css.slider.parentR }, 
+            { slider: css.slider.g, parent: css.slider.parentG }, 
+            { slider: css.slider.b, parent: css.slider.parentB },
         ].map(function(obj){
-            var css = cssClassesForControl.slider,
-                slider =  widgetDOM.querySelector("[data-channel='" + css[obj.slider] + "']"),
-                parent = getDOM(css[obj.parent]);
+            slider =  widgetDOM.querySelector("[data-channel='" + obj.slider + "']"),
+            parent = getDOM(obj.parent);
 
-                return { slider: slider, parent: parent };
+            return { slider: slider, parent: parent };
         });
 
-        var sliderResultDOM = getDOM(cssClassesForControl.slider[14]);
+        var sliderResultDOM = getDOM(css.slider.choosed);
         
-        var confirmButtonsList = [cssClassesForControl.slider[11], ].map(function(cssClass){
-            return widgetDOM.querySelector("." + cssClass);
+        var confirmButtonsList = [css.slider.confirm, ].map(function(cssClass){
+            return getDOM(cssClass);
         });
 
-        var webnamesDOMList = [].slice.call(widgetDOM.querySelectorAll("." + cssClassesForControl.square[2]));
-
+        var webnamesDOMList = [].slice.call(widgetDOM.querySelectorAll("." + css.square.value));
+        
         inputStackDOM.forEach(function(input){
             input.addEventListener("click", clickInput, false); 
         });
         /**
          * @todo Сделать единообразную обработку события клик -> в widgetEventsHandler
          */
-        var close = widgetDOM.querySelector(".close");
+        var close = widgetDOM.querySelector("." + css.widget.close);
         close.addEventListener("click", clickClose, false);
-
+        
         ["click", "mousedown", "mouseup"].forEach(function(eventType){
             widgetDOM.addEventListener(eventType, widgetEventsHandler, false);
         });
@@ -456,16 +451,19 @@ var colorPicker = (function(){
                 type = e.type,
                 stack = traversalDOMUp(e.target, widgetDOM, []),
                 fns = {
-                    0 : switchWay,
-                    1 : chooseFormat,
-                    2 : getValue
+                    "way-of-getting-color" : switchWay,
+                    "color-formats" : chooseFormat,
+                    "content-of-way" : getValue
                 };
 
             stack.forEach(function(elem){
-                cssClassesForControl.area.forEach(function(cssClass){
+                Object.keys(css.zones).forEach(function(zone){
+                    
+                    var cssClass = css.zones[zone];
+
                     if(elem.getAttribute("class") === cssClass){
                         stack.pop();
-                        fns[cssClassesForControl.area.indexOf(cssClass)](stack, type);
+                        fns[cssClass](stack, type);
                     }
                 });
             });
@@ -560,9 +558,7 @@ var colorPicker = (function(){
         }
 
         function getValue(stack, eventType){
-            
-            //currentInput.value = startValue;
-            
+                        
             switch(eventType){
                 case "mousedown": mousedown(stack); break;
                 case "mouseup"  : mouseup(stack); break;
@@ -654,9 +650,7 @@ var colorPicker = (function(){
         function clickClose(){
             hideWidget();
         }
-/**
- * @todo Переписать функцию, чтобы она была универсальной для всех форматов
- */
+
         function createOutputValueString(){
 
             var format = colorFormat;
@@ -667,7 +661,7 @@ var colorPicker = (function(){
             if(format === "webnames")
                 return rgb.colorname.toLowerCase();
             
-            var __p__ = String.prototype; 
+            var p = String.prototype; 
 
             var startOutputStringFrom = {
                 hex: "#",
@@ -685,8 +679,8 @@ var colorPicker = (function(){
             }
 
             var register = {
-                hex: __p__.toUpperCase,
-                rgb: __p__.toLowerCase,
+                hex: p.toUpperCase,
+                rgb: p.toLowerCase,
             }
 
             var useFnToBuildOutput = {
