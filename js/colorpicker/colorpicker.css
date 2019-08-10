@@ -37,6 +37,7 @@
     right: 0;
     font-size: 1.4em;
     cursor: pointer;
+<<<<<<< HEAD
 }
 
 
@@ -159,4 +160,6 @@
     border: 1px solid rgb(170, 171, 170); 
     color: rgb(88, 90, 88); 
     padding: 8px;
+=======
+>>>>>>> 5aa64cfcc5cc01caacc9e8d87aac8bae1bc41e4e
 }
