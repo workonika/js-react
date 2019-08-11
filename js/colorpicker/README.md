@@ -83,6 +83,9 @@ JS. Виджет "Colorpicker"
     setValueSliderInput
     setSlidersPosition
     setRGBThroughSlidersPosition
+    getColorFormatKeyByCssClass
+    applyDefaultValues
+    getKeyByName
 
 
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker

@@ -1,28 +1,32 @@
 /*Классы управляющие представлением элементов*/
-.hide {
-    display: "none"
+.__hide__ {
+    display: none;
 }
 
-.border {
+.__border__ {
     border: 1px solid black;
 }
 
-.displayBlock {
+.__displayBlock__ {
     display: "block"
 }
 
-.displayInlineBlock {
+.__displayInlineBlock__ {
     display: "inline-block"
 }
 
+/**Классы украшательства*/
+.__border-focus__ {
+    border: 2px solid black;
+    box-sizing: border-box;
+}
 
 /*Классы виджета*/
-.colorpicker {
+.__colorpicker__ {
     position: absolute;
     width: 350px;
     height: 300px;
     border: 1px solid rgb(170, 171, 170);
-    display: block;
     font-family: sans-serif;
     font-size: 0.8em;
     margin-top: 2px;
@@ -30,7 +34,7 @@
     color: rgb(78, 77, 77);
 }
 
-.close {
+.__close__ {
     position: absolute; 
     width: 20px; 
     height: 20px; 
@@ -41,40 +45,44 @@
 
 
 /*Классы способа выбора цвета*/
-.way-of-getting-color {
+.__way-of-getting-color__ {
     margin-top: 20px;
 }
 
-.way-of-getting-color .square, 
-.way-of-getting-color .slider {
+.__way-of-getting-color__ .__square__, 
+.__way-of-getting-color__ .__slider__ {
     display: inline-block; 
     margin-right: 15px; 
 }
 
 
 /*Классы способа выбора формата цвета*/
-.color-formats {
+.__color-formats__ {
     margin-top: 20px;
 }
 
+.__hex__, .__rgb__, .__webnames__ {
+    display: inline-block; 
+    margin-right: 15px;
+}
 
 /*Классы содержимого (выбранного способа выбора цвета)*/
-.content-of-way {
+.__content-of-way__ {
     margin-top: 20px;
 }
 
-.webname-value {
+.__webname-value__ {
     display: inline-block;
     width: 20px; 
     height: 20px; 
 }
 /* -> slide*/
-.slide {
+.__slide__ {
     display: inline-block; 
     width: 80%;
 }
 
-.parent-r, .parent-g, .parent-b {
+.__parent-r__, .__parent-g__, .__parent-b__ {
     position: relative; 
     width: 98%; 
     height: 30px; 
@@ -82,7 +90,7 @@
     margin-bottom: 5px;
 }
 
-.parent-r .r, .parent-g .g, .parent-b .b {
+.__parent-r__ .__r__, .__parent-g__ .__g__, .__parent-b__ .__b__ {
     position: absolute; 
     width: 7px; 
     height: 28px; 
@@ -91,7 +99,7 @@
     top: 0
 }
 
-.path-r, .path-g, .path-b {
+.__path-r__, .__path-g__, .__path-b__ {
     margin-top:4px; 
     width: 100%; 
     height: 20px; 
@@ -99,24 +107,24 @@
     border: 1px solid grey;
 }
 
-.path-r {
+.__path-r__ {
     background-color: #e03232;
 } 
 
-.path-g {
+.__path-g__ {
     background-color: #2f902f;
 } 
 
-.path-b {
+.__path-b__ {
     background-color: #3d3d9e;
 }
 
-.inputs {
+.__inputs__ {
     display: inline-block;
     width: 18%;
 }
 
-.slide-input {
+.__slide-input__ {
     position: relative; 
     width: 100%; 
     height: 30px; 
@@ -124,7 +132,7 @@
     margin-bottom: 5px;
 }
 
-.slide-input .r, .slide-input .g, .slide-input .b {
+.__slide-input__ .__r__, .__slide-input__ .__g__, .__slide-input__ .__b__ {
     position: absolute; 
     width: 100%; 
     height: 28px; 
@@ -132,18 +140,18 @@
 }
 
 /*Содержимое -> Результат*/
-.result {
+.__result__ {
     border-top:1px solid transparent; 
     margin-top: 5px;
 }
 
-.result-text {
+.__result-text__ {
     display: inline-block; 
     vertical-align: top; 
     margin: 12px 10px 0 0;
 }
 
-.slider-result {
+.__slider-result__ {
     display:inline-block; 
     width: 40px;
     height: 40px; 
@@ -151,7 +159,7 @@
     border: 1px solid black;
 }
 
-.confirm-button {
+.__confirm-button__ {
     display: inline-block;
     vertical-align: top; 
     margin: 4px 0 0 44px; 

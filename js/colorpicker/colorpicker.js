@@ -37,6 +37,8 @@ var colorPicker = (function(){
             }
         };
         //Соответствие доступных форматов цветов способу получения цвета
+        //Имена свойств в структуре matchFormatToMethod должны полностью совпадать 
+        //с именами в структуре wayOfGettingColor
         var matchFormatToMethod = {
             //Сначала с меньшим индексом
             square: [ 
@@ -63,20 +65,47 @@ var colorPicker = (function(){
             ],
         };
 
-        var cssForControl = {
-            widget: { colorpicker: "colorpicker", close: "close"},
-            zones: { way: "way-of-getting-color", format: "color-formats", content: "content-of-way"},
-            square: { webnames: "webnames", rgb: "rgb", value: "webname-value" },
-            slider: {
-                r: "r", g: "g", b: "b",
-                parentR: "parent-r", parentG: "parent-g", parentB: "parent-b",
-                pathR: "path-r", pathG: "path-g", pathB: "path-b",
-                inputs: "inputs", slideInput: "slide-input", confirm: "confirm-button", slide: "slide", 
-                result: "result", resultText: "result-text", choosed: "slider-result"
+        /**В этой структуре значениями свойств (речь о примитивах) являются имена классов в css-файле*/
+        var cssClasses = {
+            struct: {
+                widget: { colorpicker: "__colorpicker__", },
+                zones: { way: "__way-of-getting-color__", format: "__color-formats__", 
+                    content: "__content-of-way__" },
+                
+                ways: { square: "__square__", slider: "__slider__" },
+                /**Имена свойств способов получения цвета соответствуют именам свойств в структуре wayOfGettingColor */
+                
+                formats: { rgb: "__rgb__", hex: "__hex__", webnames: "__webnames__" },
+                /**Имена свойств форматов соответствуют именам свойств в структуре colorFormats */
             },
-            present: {
-                hide: "hide", border: "border", displayBlock: "display-block", displayInlineBlock: "display-inline-block"
-            }
+            content: {
+                widget: {
+                    close: "__close__"
+                },
+                square: {
+                    webnames: "__webnames__", rgb: "__rgb__", value: "__webname-value__" 
+                },
+                slider: {
+                    r: "__r__", g: "__g__", b: "__b__",
+                    parentR: "__parent-r__", parentG: "__parent-g__", parentB: "__parent-b__",
+                    pathR: "__path-r__", pathG: "__path-g__", pathB: "__path-b__",
+                    inputs: "__inputs__", slideInput: "__slide-input__", slide: "__slide__", 
+                },
+                result: {
+                    result: "__result__", resultText: "__result-text__", 
+                    choosed: "__slider-result__", confirm: "__confirm-button__", 
+                }
+            },
+            look: {
+                square: {
+                    borderFocus: "__border-focus__"
+                }
+            },
+            control: {
+                hide: "__hide__", border: "__border__", displayBlock: "__display-block__", 
+                displayInlineBlock: "__display-inline-block__"
+            },
+            custom: params.custom,
         };
 
         var colorNames = JSON.parse('{"stack":[{"groupName":"Красные","colors":[{"name":"indianred","dec":{"r":205,"g":92,"b":92}},{"name":"lightcoral","dec":{"r":240,"g":128,"b":128}},{"name":"salmon","dec":{"r":250,"g":128,"b":114}},{"name":"darksalmon","dec":{"r":233,"g":150,"b":122}},{"name":"lightsalmon","dec":{"r":255,"g":160,"b":122}},{"name":"crimson","dec":{"r":220,"g":20,"b":60}},{"name":"red","dec":{"r":255,"g":0,"b":0}},{"name":"firebrick","dec":{"r":178,"g":34,"b":34}},{"name":"darkred","dec":{"r":139,"g":0,"b":0}}]},{"groupName":"Розовые","colors":[{"name":"pink","dec":{"r":255,"g":192,"b":203}},{"name":"lightpink","dec":{"r":255,"g":182,"b":193}},{"name":"hotpink","dec":{"r":255,"g":105,"b":180}},{"name":"deeppink","dec":{"r":255,"g":20,"b":147}},{"name":"mediumvioletred","dec":{"r":199,"g":21,"b":133}},{"name":"palevioletred","dec":{"r":219,"g":112,"b":147}}]},{"groupName":"Оранжевые","colors":[{"name":"coral","dec":{"r":255,"g":127,"b":80}},{"name":"tomato","dec":{"r":255,"g":99,"b":71}},{"name":"orangered","dec":{"r":255,"g":69,"b":0}},{"name":"darkorange","dec":{"r":255,"g":140,"b":0}},{"name":"orange","dec":{"r":255,"g":165,"b":0}}]},{"groupName":"Жёлтые","colors":[{"name":"gold","dec":{"r":255,"g":215,"b":0}},{"name":"yellow","dec":{"r":255,"g":255,"b":0}},{"name":"lightyellow","dec":{"r":255,"g":255,"b":224}},{"name":"lemonchiffon","dec":{"r":255,"g":250,"b":205}},{"name":"lightgoldenrodyellow","dec":{"r":250,"g":250,"b":210}},{"name":"papayawhip","dec":{"r":255,"g":239,"b":213}},{"name":"moccasin","dec":{"r":255,"g":228,"b":181}},{"name":"peachpuff","dec":{"r":255,"g":218,"b":185}},{"name":"palegoldenrod","dec":{"r":238,"g":232,"b":170}},{"name":"khaki","dec":{"r":240,"g":230,"b":140}},{"name":"darkkhaki","dec":{"r":189,"g":183,"b":107}}]},{"groupName":"Фиолетовые","colors":[{"name":"lavender","dec":{"r":230,"g":230,"b":250}},{"name":"thistle","dec":{"r":216,"g":191,"b":216}},{"name":"plum","dec":{"r":221,"g":160,"b":221}},{"name":"violet","dec":{"r":238,"g":130,"b":238}},{"name":"orchid","dec":{"r":218,"g":112,"b":214}},{"name":"fuchsia","dec":{"r":255,"g":0,"b":255}},{"name":"mediumorchid","dec":{"r":186,"g":85,"b":211}},{"name":"mediumpurple","dec":{"r":147,"g":112,"b":219}},{"name":"blueviolet","dec":{"r":138,"g":43,"b":226}},{"name":"darkviolet","dec":{"r":148,"g":0,"b":211}},{"name":"darkorchid","dec":{"r":153,"g":50,"b":204}},{"name":"darkmagenta","dec":{"r":139,"g":0,"b":139}},{"name":"purple","dec":{"r":128,"g":0,"b":128}},{"name":"indigo","dec":{"r":75,"g":0,"b":130}},{"name":"slateblue","dec":{"r":106,"g":90,"b":205}},{"name":"darkslateblue","dec":{"r":72,"g":61,"b":139}}]},{"groupName":"Зелёные","colors":[{"name":"greenyellow","dec":{"r":173,"g":255,"b":47}},{"name":"chartreuse","dec":{"r":127,"g":255,"b":0}},{"name":"lawngreen","dec":{"r":124,"g":252,"b":0}},{"name":"lime","dec":{"r":0,"g":255,"b":0}},{"name":"limegreen","dec":{"r":50,"g":205,"b":50}},{"name":"palegreen","dec":{"r":152,"g":251,"b":152}},{"name":"lightgreen","dec":{"r":144,"g":238,"b":144}},{"name":"mediumspringgreen","dec":{"r":0,"g":250,"b":154}},{"name":"springgreen","dec":{"r":0,"g":255,"b":127}},{"name":"mediumseagreen","dec":{"r":60,"g":179,"b":113}},{"name":"seagreen","dec":{"r":46,"g":139,"b":87}},{"name":"forestgreen","dec":{"r":34,"g":139,"b":34}},{"name":"green","dec":{"r":0,"g":128,"b":0}},{"name":"darkgreen","dec":{"r":0,"g":100,"b":0}},{"name":"yellowgreen","dec":{"r":154,"g":205,"b":50}},{"name":"olivedrab","dec":{"r":107,"g":142,"b":35}},{"name":"olive","dec":{"r":128,"g":128,"b":0}},{"name":"darkolivegreen","dec":{"r":85,"g":107,"b":47}},{"name":"mediumaquamarine","dec":{"r":102,"g":205,"b":170}},{"name":"darkseagreen","dec":{"r":143,"g":188,"b":143}},{"name":"lightseagreen","dec":{"r":32,"g":178,"b":170}},{"name":"darkcyan","dec":{"r":0,"g":139,"b":139}},{"name":"teal","dec":{"r":0,"g":128,"b":128}}]},{"groupName":"Синие","colors":[{"name":"aqua","dec":{"r":0,"g":255,"b":255}},{"name":"lightcyan","dec":{"r":224,"g":255,"b":255}},{"name":"paleturquoise","dec":{"r":175,"g":238,"b":238}},{"name":"aquamarine","dec":{"r":127,"g":255,"b":212}},{"name":"turquoise","dec":{"r":64,"g":224,"b":208}},{"name":"mediumturquoise","dec":{"r":72,"g":209,"b":204}},{"name":"darkturquoise","dec":{"r":0,"g":206,"b":209}},{"name":"cadetblue","dec":{"r":95,"g":158,"b":160}},{"name":"steelblue","dec":{"r":70,"g":130,"b":180}},{"name":"lightsteelblue","dec":{"r":176,"g":196,"b":222}},{"name":"powderblue","dec":{"r":176,"g":224,"b":230}},{"name":"lightblue","dec":{"r":173,"g":216,"b":230}},{"name":"skyblue","dec":{"r":135,"g":206,"b":235}},{"name":"lightskyblue","dec":{"r":135,"g":206,"b":250}},{"name":"deepskyblue","dec":{"r":0,"g":191,"b":255}},{"name":"dodgerblue","dec":{"r":30,"g":144,"b":255}},{"name":"cornflowerblue","dec":{"r":100,"g":149,"b":237}},{"name":"mediumslateblue","dec":{"r":123,"g":104,"b":238}},{"name":"royalblue","dec":{"r":65,"g":105,"b":225}},{"name":"blue","dec":{"r":0,"g":0,"b":255}},{"name":"mediumblue","dec":{"r":0,"g":0,"b":205}},{"name":"darkblue","dec":{"r":0,"g":0,"b":139}},{"name":"navy","dec":{"r":0,"g":0,"b":128}},{"name":"midnightblue","dec":{"r":25,"g":25,"b":112}}]},{"groupName":"Коричневые","colors":[{"name":"cornsilk","dec":{"r":255,"g":248,"b":220}},{"name":"blanchedalmond","dec":{"r":255,"g":235,"b":205}},{"name":"bisque","dec":{"r":255,"g":228,"b":196}},{"name":"navajowhite","dec":{"r":255,"g":222,"b":173}},{"name":"wheat","dec":{"r":245,"g":222,"b":179}},{"name":"burlywood","dec":{"r":222,"g":184,"b":135}},{"name":"tan","dec":{"r":210,"g":180,"b":140}},{"name":"rosybrown","dec":{"r":188,"g":143,"b":143}},{"name":"sandybrown","dec":{"r":244,"g":164,"b":96}},{"name":"goldenrod","dec":{"r":218,"g":165,"b":32}},{"name":"darkgoldenrod","dec":{"r":184,"g":134,"b":11}},{"name":"peru","dec":{"r":205,"g":133,"b":63}},{"name":"chocolate","dec":{"r":210,"g":105,"b":30}},{"name":"saddlebrown","dec":{"r":139,"g":69,"b":19}},{"name":"sienna","dec":{"r":160,"g":82,"b":45}},{"name":"brown","dec":{"r":165,"g":42,"b":42}},{"name":"maroon","dec":{"r":128,"g":0,"b":0}}]},{"groupName":"Белые","colors":[{"name":"white","dec":{"r":255,"g":255,"b":255}},{"name":"snow","dec":{"r":255,"g":250,"b":250}},{"name":"honeydew","dec":{"r":240,"g":255,"b":240}},{"name":"mintcream","dec":{"r":245,"g":255,"b":250}},{"name":"azure","dec":{"r":240,"g":255,"b":255}},{"name":"aliceblue","dec":{"r":240,"g":248,"b":255}},{"name":"ghostwhite","dec":{"r":248,"g":248,"b":255}},{"name":"whitesmoke","dec":{"r":245,"g":245,"b":245}},{"name":"seashell","dec":{"r":255,"g":245,"b":238}},{"name":"beige","dec":{"r":245,"g":245,"b":220}},{"name":"oldlace","dec":{"r":253,"g":245,"b":230}},{"name":"floralwhite","dec":{"r":255,"g":250,"b":240}},{"name":"ivory","dec":{"r":255,"g":255,"b":240}},{"name":"antiquewhite","dec":{"r":250,"g":235,"b":215}},{"name":"linen","dec":{"r":250,"g":240,"b":230}},{"name":"lavenderblush","dec":{"r":255,"g":240,"b":245}},{"name":"mistyrose","dec":{"r":255,"g":228,"b":225}}]}]}');
@@ -119,7 +148,7 @@ var colorPicker = (function(){
             matchFormatToMethod: matchFormatToMethod, 
             lang: lang,
             colorFormats: colorFormats,
-            cssForControl: cssForControl,
+            cssClasses: cssClasses,
             waysOfGettingColorKeys: waysOfGettingColorKeys,
             startWayName: startWayName,
             startColorFormat: startColorFormat,
@@ -133,7 +162,7 @@ var colorPicker = (function(){
             widgetDOM: widgetDOM,
             inputStackDOM: inputStackDOM,
             getInputSizeAndPosition: getInputSizeAndPosition,
-            cssForControl: cssForControl,
+            cssClasses: cssClasses,
             waysOfGettingColorKeys: waysOfGettingColorKeys,
             colorFormatsKeys: Object.keys(colorFormats[lang]),
             startWayName: startWayName,
@@ -145,14 +174,6 @@ var colorPicker = (function(){
 
     //конец функции colorPicker
     }
-
-    var display = function(isTrue, displayAs){
-        return isTrue ? (displayAs || "block") : "none";
-    };
-
-    var border = function(isTrue){
-        return isTrue ? "1px solid black" : "none";
-    };
 
     //Получить размеры DOM-элемента, а также абсолютную позицию top, left
     //определенного как параметр и конечно переданного в качестве аргумента при вызове ф-ии
@@ -173,58 +194,58 @@ var colorPicker = (function(){
         
         var p = params, 
             div = document.createElement("div"),
-            css = p.cssForControl;
+            css = p.cssClasses,
+            cssWays = css.struct.ways,
+            cssFormats = css.struct.formats;
 
-            div.setAttribute("class", css.widget.colorpicker);
+            div.classList.add(css.struct.widget.colorpicker);
 
-        var innerHTML = { innerHTML: "<div class=" + css.widget.close + ">&times;</div>", },
+        var innerHTML = { innerHTML: "<div class=" + css.content.widget.close + ">&times;</div>", },
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             matchFormatToMethod = p.matchFormatToMethod,
             colorFormats = p.colorFormats;
 
-        var contentMap = {
-            square: buildSquare.bind({css: css.square, colors: p.colorNames, }),
-            slider: buildSlider.bind({css: css.slider}),
+        var contentMapFn = {
+            square: buildSquare.bind({css: css, colors: p.colorNames, }),
+            slider: buildSlider.bind({css: css}),
         };
         
-        var widgetAreaMap = {
-            "way-of-getting-color" : function(curr, next){
-                return curr + "<div class='" + next + "' title='" 
-                    + p.wayOfGettingColor[p.lang][next].name + "' style='border:" 
-                    + border(next === p.startWayName) + "'>"
+        var widgetAreaMap = {};
+
+        widgetAreaMap[css.struct.zones.way] = function(curr, next){
+                return curr + "<div class='" + cssWays[next] + "' title='" 
+                    + p.wayOfGettingColor[p.lang][next].name + "'>"
                     + p.wayOfGettingColor[p.lang][next].name + "</div>";
-            },
-            "color-formats" : function(curr, next){
+            };
+        
+        widgetAreaMap[css.struct.zones.format] = function(curr, next){
                 var matchFormat = matchFormatToMethod[next]
                     .filter(function(format){ return format.match})
                     .sort(function(a,b){return a.order-b.order});
 
-                var _display = display(next === p.startWayName);
-
-                var str = curr + "<div class='" + next + "' title='" 
-                    + p.wayOfGettingColor[p.lang][next].name + "' style='display:" + _display + "'>";
+                var str = curr + "<div class='" + cssWays[next] + "' title='" 
+                    + p.wayOfGettingColor[p.lang][next].name + "'>";
 
                 matchFormat.forEach(function(format){
-                    str += "<div class='" + format.name + "' title='" + colorFormats[p.lang][format.name].name + "' style='border:" 
-                    + border(_display === "block" && format.name === p.startColorFormat) 
-                    + "; display: inline-block; margin-right: 15px;'>"
+                    str += "<div class='" + cssFormats[format.name] + "' title='" 
+                    + colorFormats[p.lang][format.name].name + "'>"
                     + colorFormats[p.lang][format.name].name + "</div>";
                 });
 
                 return str + "</div>";
-            },
-            "content-of-way" : function(curr, next){
-                return curr + "<div class='" + next + "' style='display:" + display(next === p.startWayName) + "'>" + contentMap[next]() + "</div>";
-            }
-        };
-
+            };
+        
+        widgetAreaMap[css.struct.zones.content] =  function(curr, next){
+                return curr + "<div class='" + cssWays[next] + "'>" + contentMapFn[next]() + "</div>";
+            };
+        
         waysOfGettingColorKeys.sort(function(a,b){
             return p.wayOfGettingColor[p.lang][a].order - p.wayOfGettingColor[p.lang][b].order
         });
 
-        Object.keys(css.zones).forEach(function(zone){
+        Object.keys(css.struct.zones).forEach(function(zone){
             
-            var cssClass = css.zones[zone];
+            var cssClass = css.struct.zones[zone];
 
             this.innerHTML += "<div class='" + cssClass + "'>" +
                 
@@ -246,10 +267,10 @@ var colorPicker = (function(){
             //innerHTML += "<div>" + colorGroup.groupName + "</div>";
             //При необходимости можно выводить имена групп цветов - тогда нужно расскомментировать предыдущую строку
             colorGroup.colors.forEach(function(color){
-                innerHTML += "<div class='" + this.css.value + "' style='background:" + color.name 
+                innerHTML += "<div class='" + this.css.content.square.value + "' style='background:" + color.name 
                     + "' data-colorname='" + color.name 
                     + "' title='" + color.name + " rgb(" + color.dec.r + ", " + color.dec.g + ", " + color.dec.b + ")'"
-                    + "' data-r='" + color.dec.r + "' data-g='" + color.dec.g + "' data-b='" + color.dec.b + "'>"
+                    + " data-r='" + color.dec.r + "' data-g='" + color.dec.g + "' data-b='" + color.dec.b + "'>"
                     + "</div>";
             }, this);
         }, this);
@@ -258,19 +279,22 @@ var colorPicker = (function(){
     }
 
     function buildSlider(){
-        var innerHTML = "";
+        var innerHTML = "",
+            css = this.css.content.slider;
 
-            innerHTML += "<div class='" + this.css.slide + "'>"
-                + createSlide(this.css.parentR, this.css.r, this.css.pathR)
-                + createSlide(this.css.parentG, this.css.g, this.css.pathG)
-                + createSlide(this.css.parentB, this.css.b, this.css.pathB) + "</div>";
 
-            innerHTML += "<div class='" + this.css.inputs + "'>" 
-                + createInput(this.css.slideInput, this.css.r) 
-                + createInput(this.css.slideInput, this.css.g) 
-                + createInput(this.css.slideInput, this.css.b) + "</div>";
+            innerHTML += "<div class='" + css.slide + "'>"
+                + createSlide(css.parentR, css.r, css.pathR)
+                + createSlide(css.parentG, css.g, css.pathG)
+                + createSlide(css.parentB, css.b, css.pathB) + "</div>";
 
-            innerHTML += createResult(this.css.result, this.css.resultText, this.css.choosed, this.css.confirm);
+            innerHTML += "<div class='" + css.inputs + "'>" 
+                + createInput(css.slideInput, css.r) 
+                + createInput(css.slideInput, css.g) 
+                + createInput(css.slideInput, css.b) + "</div>";
+
+            innerHTML += createResult(this.css.content.result.result, this.css.content.result.resultText, 
+                this.css.content.result.choosed, this.css.content.result.confirm);
 
         return innerHTML;
     }
@@ -314,7 +338,7 @@ var colorPicker = (function(){
             widgetDOM = p.widgetDOM,
             inputStackDOM = p.inputStackDOM,
             getInputSizeAndPosition = p.getInputSizeAndPosition,
-            css = p.cssForControl,
+            css = p.cssClasses,
             waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             colorFormat = p.startColorFormat,
             colorFormatsKeys = p.colorFormatsKeys,
@@ -331,25 +355,27 @@ var colorPicker = (function(){
 
         oneWayDifferrentAreas = [squareDOMList, sliderDOMList];
 
-        oneWayDifferrentAreas = waysOfGettingColorKeys.map(function(cssClass){
-            return [].slice.call(widgetDOM.querySelectorAll("." + cssClass));
+        oneWayDifferrentAreas = waysOfGettingColorKeys.map(function(wayName){
+            return [].slice.call(widgetDOM.querySelectorAll("." + css.struct.ways[wayName]));
         });
 
-        var formatsDOM = getDeepNestedElems(css.zones.format),
-            contentDOM = getNestedElems(css.zones.content);
+        var waysDOM = getElemsByWay(css.struct.zones.way),
+            formatsDOM = getElemsByColorFormat(css.struct.zones.format),
+            formatsDOMByWay = getElemsByWay(css.struct.zones.format),
+            contentsDOM = getElemsByWay(css.struct.zones.content);
             
         var contentAreaEventsHandles = [squareFn, sliderFn];
        
         var currentMousemoveElem;
         
-        var rgbInputsList = [css.slider.r, css.slider.g, css.slider.b].map(function(name){
+        var rgbInputsList = [css.content.slider.r, css.content.slider.g, css.content.slider.b].map(function(name){
             return widgetDOM.querySelector("[name='" + name + "']");
         });
    
         var slidersList = [
-            { slider: css.slider.r, parent: css.slider.parentR }, 
-            { slider: css.slider.g, parent: css.slider.parentG }, 
-            { slider: css.slider.b, parent: css.slider.parentB },
+            { slider: css.content.slider.r, parent: css.content.slider.parentR }, 
+            { slider: css.content.slider.g, parent: css.content.slider.parentG }, 
+            { slider: css.content.slider.b, parent: css.content.slider.parentB },
         ].map(function(obj){
             slider =  widgetDOM.querySelector("[data-channel='" + obj.slider + "']"),
             parent = getDOM(obj.parent);
@@ -357,13 +383,13 @@ var colorPicker = (function(){
             return { slider: slider, parent: parent };
         });
 
-        var sliderResultDOM = getDOM(css.slider.choosed);
+        var sliderResultDOM = getDOM(css.content.result.choosed);
         
-        var confirmButtonsList = [css.slider.confirm, ].map(function(cssClass){
+        var confirmButtonsList = [css.content.result.confirm, ].map(function(cssClass){
             return getDOM(cssClass);
         });
 
-        var webnamesDOMList = [].slice.call(widgetDOM.querySelectorAll("." + css.square.value));
+        var webnamesDOMList = [].slice.call(widgetDOM.querySelectorAll("." + css.content.square.value));
         
         inputStackDOM.forEach(function(input){
             input.addEventListener("click", clickInput, false); 
@@ -371,31 +397,33 @@ var colorPicker = (function(){
         /**
          * @todo Сделать единообразную обработку события клик -> в widgetEventsHandler
          */
-        var close = widgetDOM.querySelector("." + css.widget.close);
+        var close = widgetDOM.querySelector("." + css.content.widget.close);
         close.addEventListener("click", clickClose, false);
         
         ["click", "mousedown", "mouseup"].forEach(function(eventType){
             widgetDOM.addEventListener(eventType, widgetEventsHandler, false);
         });
 
+        applyDefaultValues();
+
         function getDOM(cssClass){
             return widgetDOM.querySelector("." + cssClass);
         }
 
-        function getNestedElems(cssClass){
+        function getElemsByWay(cssClass){
             var _widgetDOM = widgetDOM.querySelector("." + cssClass);
-            return [].concat.apply([], waysOfGettingColorKeys.map(function(key){
-                return [].slice.call(_widgetDOM.querySelectorAll("." + key));
+            return [].concat.apply([], waysOfGettingColorKeys.map(function(way){
+                return [].slice.call(_widgetDOM.querySelectorAll("." + css.struct.ways[way]));
             }));
         }
 
-        function getDeepNestedElems(cssClass){
+        function getElemsByColorFormat(cssClass){
             
-            var nestedElems = getNestedElems(cssClass);
+            var nestedElems = getElemsByWay(cssClass);
 
             return nestedElems.map(function(parentNode){
                 var elementsByFormat = colorFormatsKeys
-                    .map(function(key){return parentNode.querySelector("." + key)})
+                    .map(function(format){return parentNode.querySelector("." + css.struct.formats[format])})
                     .filter(function(node){return !!node});
                 
                 return elementsByFormat;
@@ -450,16 +478,16 @@ var colorPicker = (function(){
             var 
                 type = e.type,
                 stack = traversalDOMUp(e.target, widgetDOM, []),
-                fns = {
-                    "way-of-getting-color" : switchWay,
-                    "color-formats" : chooseFormat,
-                    "content-of-way" : getValue
-                };
+                fns = {};
+
+                fns[css.struct.zones.way] = switchWay;
+                fns[css.struct.zones.format] = chooseFormat;
+                fns[css.struct.zones.content] = getValue;
 
             stack.forEach(function(elem){
-                Object.keys(css.zones).forEach(function(zone){
+                Object.keys(css.struct.zones).forEach(function(zone){
                     
-                    var cssClass = css.zones[zone];
+                    var cssClass = css.struct.zones[zone];
 
                     if(elem.getAttribute("class") === cssClass){
                         stack.pop();
@@ -471,26 +499,30 @@ var colorPicker = (function(){
 
         function switchWay(stack){
                 
-            var index = -1; 
+            var index = -1,
+                currentCssClass;
             
             stack.forEach(function(DOMElem){
-                waysOfGettingColorKeys.forEach(function(cssClass, idx){
+                waysOfGettingColorKeys.forEach(function(key, idx){
+
+                    var cssClass = css.struct.ways[key];
                     
                     var cssClassOfElement = DOMElem.getAttribute("class");
                     
                     if(cssClassOfElement && cssClassOfElement.indexOf(cssClass) !== -1){
+                        currentCssClass = cssClass;
                         index = idx;
-                        startWayName = cssClass;
+                        startWayName = key;
                     }
                 });
             })
-          
+
             oneWayDifferrentAreas.forEach(function(elemsGroup, idx){
                 elemsGroup.forEach(function(elem, ndx){
-                    if(ndx !== 0)
-                        elem.style.display = display(idx === index);
+                    if(ndx === 0)
+                        elem.classList[ elem.classList.contains(currentCssClass) ? "add" : "remove" ](css.control.border);
                     else
-                        elem.style.border = border(idx === index);
+                        elem.classList[ elem.classList.contains(currentCssClass) ? "remove" : "add" ](css.control.hide);
                 });
             });
 
@@ -508,14 +540,14 @@ var colorPicker = (function(){
             
             formatsDOM[index].forEach(function(formatDOMElem){
                
-                formatDOMElem.style.border = border(false);
+                formatDOMElem.classList.remove(css.control.border);
                 
                 stack.forEach(function(stackDOMElem){
                     
                     if(formatDOMElem === stackDOMElem){
-                        formatDOMElem.style.border = border(true);
+                        formatDOMElem.classList.add(css.control.border);
                         isAnyFormatDOMElemInStack = true;
-                        colorFormat = formatDOMElem.getAttribute("class");
+                        colorFormat = getColorFormatKeyByCssClass(formatDOMElem);
                     }
                 });
             });
@@ -524,12 +556,12 @@ var colorPicker = (function(){
                 
                 isAnyFormatDOMElemEqualToStartColor = formatsDOM[index].some(function(formatDOMElem){
                     
-                    var cssClass = formatDOMElem.getAttribute("class"),
-                        isEqual = cssClass.indexOf(colorFormat) !== -1;
+                    var colorFormatChoosen = getColorFormatKeyByCssClass(formatDOMElem),
+                        isEqual = colorFormat === colorFormatChoosen;
 
                     if(isEqual){
-                        colorFormat = cssClass;
-                        formatDOMElem.style.border = border(true);
+                        colorFormat = colorFormatChoosen;
+                        formatDOMElem.classList.add(css.control.border);
                     }
 
                     return isEqual;
@@ -537,17 +569,18 @@ var colorPicker = (function(){
                 
                 if(!isAnyFormatDOMElemEqualToStartColor){
                     
-                    colorFormatsKeys.forEach(function(_colorFormat){
+                    colorFormatsKeys.forEach(function(colorKey){
                         formatsDOM[index].forEach(function(DOMElem){
-                            if(DOMElem.getAttribute("class").indexOf(_colorFormat) !== -1){
+                            if(colorKey === getColorFormatKeyByCssClass(DOMElem)){
+
                                 if(!isAnyFormatDOMElemEqualToStartColor){
                                     //Эта проверка может показаться излишней, но в массиве colorFormatsKeys
                                     //совпадения со значениями атрибута class в DOM-элементах может быть более одного
                                     
                                     //Также, для большего контроля можно использовать переменную со значением
                                     //того формат, который назначается по умолчанию в случае отсутствия у способа
-                                    DOMElem.style.border = border(true);
-                                    colorFormat = _colorFormat;
+                                    DOMElem.classList.add(css.control.border);
+                                    colorFormat = colorKey;
                                     isAnyFormatDOMElemEqualToStartColor = true;
                                 }
                             }
@@ -555,6 +588,24 @@ var colorPicker = (function(){
                     });
                 }
             }
+        }
+
+        function getColorFormatKeyByCssClass(elem){
+            
+            var list = [].slice.call(elem.classList),
+                key;
+            
+            list.forEach(function(cssClass){
+                var obj = css.struct.formats;
+                for(var prop in obj){
+                    if(obj.hasOwnProperty(prop)){
+                        if(obj[prop] === cssClass)
+                            key = prop;
+                    }
+                }
+            });
+
+            return key;
         }
 
         function getValue(stack, eventType){
@@ -609,7 +660,7 @@ var colorPicker = (function(){
 
         function click(stack){
             
-            matchingElements(stack, contentDOM, function(){
+            matchingElements(stack, contentsDOM, function(){
                 var arg = [].slice.call(arguments)[0];
                 contentAreaEventsHandles[arg.arrs[1].idx](stack);
             });
@@ -639,7 +690,7 @@ var colorPicker = (function(){
             var rgbMap = {};
 
             rgbInputsList.forEach(function(channel){
-                this[channel.name] = channel.value;
+                this[getKeyByName(channel.name)] = channel.value;
             }, rgbMap);
 
             matchingElements(stack, confirmButtonsList, function(){
@@ -846,18 +897,16 @@ var colorPicker = (function(){
 
             webnamesDOMList.forEach(function(item){
                 
-                var isEqual = rgb.colorname 
+                var isEqual = rgb.colorname
                     ? item.getAttribute("data-colorname") === rgb.colorname
                     : (+item.getAttribute("data-r") === rgb.r
                     && +item.getAttribute("data-g") === rgb.g
                     && +item.getAttribute("data-b") === rgb.b);
 
                 if(isEqual){
-                    item.style.boxSizing = "border-box";
-                    item.style.border = "2px solid black";
+                    item.classList.add(css.look.square.borderFocus);
                 } else {
-                    item.style.boxSizing = "content-box";
-                    item.style.border = "none";
+                    item.classList.remove(css.look.square.borderFocus);
                 }
             });
 
@@ -866,45 +915,67 @@ var colorPicker = (function(){
 
         function setValueSliderInput(){
             rgbInputsList.forEach(function(item){
-                var value = rgb[item.getAttribute("name")];
+                var key = getKeyByName(item.getAttribute("name"));
+                var value = rgb[key];
                 item.value = value !== undefined ? value : "0";
             });
         }
 
         function setSlidersPosition(){
             slidersList.forEach(function(itemMap){
-                if(rgb[itemMap.slider.getAttribute("data-channel")]){
+                var key = getKeyByName(itemMap.slider.getAttribute("data-channel"));
+                if(rgb[key]){
                     var ratio = itemMap.parent.clientWidth/255;
                     itemMap.slider.style.left = 
-                        ratio * rgb[itemMap.slider.getAttribute("data-channel")] 
-                        - itemMap.slider.getBoundingClientRect().width + "px";
+                        ratio * rgb[key] - itemMap.slider.getBoundingClientRect().width + "px";
                 }
             });
         }
 
         function setRGBThroughSlidersPosition(){
             slidersList.forEach(function(itemMap){
-                rgb[itemMap.slider.getAttribute("data-channel")] = 
-                    parseFloat(itemMap.slider.style.left)
+                var key = getKeyByName(itemMap.slider.getAttribute("data-channel"));
+
+                rgb[key] = parseFloat(itemMap.slider.style.left || 0)
                     /(itemMap.parent.clientWidth - itemMap.slider.getBoundingClientRect().width) 
                     * 255;
             });
 
             rgbInputsList.forEach(function(input){
-                input.value = parseInt(rgb[input.getAttribute("class")]);
+                var key = getKeyByName(input.getAttribute("name"));
+                input.value = parseInt(rgb[key]);
             });
         }
 
         function setSliderResultValue(){
 
-            var _rgb = {r: undefined, g: undefined, b: undefined};
+            var _rgb = {}, r, g, b;
+
+            _rgb[ r = css.content.slider.r ] = undefined;
+            _rgb[ g = css.content.slider.g ] = undefined;
+            _rgb[ b = css.content.slider.b ] = undefined;
             
             rgbInputsList.forEach(function(input){
-                _rgb[input.name] = rgb[input.name] || input.value;
+                _rgb[input.name] = rgb[getKeyByName(input.name)] || input.value;
             });
 
             sliderResultDOM.style.backgroundColor = 
-                "rgb(" + _rgb.r + ", " + _rgb.g + ", "  + _rgb.b + ")";
+                "rgb(" + _rgb[r] + ", " + _rgb[g] + ", "  + _rgb[b] + ")";
+        }
+
+        function getKeyByName(name){
+            var obj = css.content.slider,
+                returnKey;
+
+            for(var key in obj){
+                if(obj.hasOwnProperty(key)){
+                    if(obj[key] === name){
+                        returnKey = key;
+                    }
+                }
+            }
+
+            return returnKey;
         }
 
         function saveRGB(params){
@@ -920,7 +991,7 @@ var colorPicker = (function(){
         function hideWidget(){
             
             document.removeEventListener("click", clickOutOfWidget, false);
-            widgetDOM.style.display = "none";
+            widgetDOM.classList.add(css.control.hide);
 
             inputStackDOM.forEach(function(input){
                 input.removeAttribute("data-is-colorpicker-opened");
@@ -945,7 +1016,36 @@ var colorPicker = (function(){
 
         function displayWidget(){
             document.addEventListener("click", clickOutOfWidget, false);
-            widgetDOM.style.display = "block";
+            widgetDOM.classList.remove(css.control.hide);
+        }
+        
+        function applyDefaultValues(){
+            //1
+            widgetDOM.classList.add(css.control.hide);
+            //2
+            waysDOM.forEach(function(wayDOM){
+                if(wayDOM.classList.contains(css.struct.ways[startWayName]))
+                    wayDOM.classList.add(css.control.border);
+            });
+            //3
+            contentsDOM.forEach(function(contentDOM){
+                if(!contentDOM.classList.contains(css.struct.ways[startWayName])){
+                    contentDOM.classList.add(css.control.hide);
+                }
+            });
+
+            formatsDOMByWay.forEach(function(formatDOM){
+                if(!formatDOM.classList.contains(css.struct.ways[startWayName])){
+                    formatDOM.classList.add(css.control.hide);
+                }
+            });
+            //4
+            formatsDOM.forEach(function(oneWayFormatsDOMList){
+                oneWayFormatsDOMList.forEach(function(formatDOM){
+                    if(formatDOM.classList.contains(css.struct.formats[colorFormat]))
+                        formatDOM.classList.add(css.control.border);
+                });
+            });
         }
 
         function traversalDOMUp(DOMElement, targetElement, stack){
