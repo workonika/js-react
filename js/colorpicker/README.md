@@ -2,15 +2,21 @@ JS. Виджет "Colorpicker"
 ========================
 <./developer>
 
+Структуры данных виджета
+-------------------------
+    wayOfGettingColor
+    colorFormats
+    matchFormatToMethod
+    colorNames
+    cssClasses
+
 Функции виджета
 ---------------
     colorPicker - возвращаемая функция из модуля (IIFE)
-    display
-    border
+    copyObject
     getInputSizeAndPosition
     createWidgetDOMElement
     buildSquare
-    buildRect
     buildSlider
     createResult
     createSlide
@@ -18,16 +24,14 @@ JS. Виджет "Colorpicker"
     restructurize
     bindEventListeners
 
-Структуры данных colorPicker
--------------------------
-    wayOfGettingColor
-    colorFormats
-    matchFormatToMethod
-    colorNames
+Структуры данных функции colorPicker
+------------------------------------
     inputStackDOM
-    cssClassesForControl
+    commonParams
+    paramsOfcreateWidgetDOMElement
+    paramsOfBindEventListeners
 
-Структуры данных bindEventListeners
+Структуры данных функции bindEventListeners
 --------------------------
     rgba
     oneWayDifferrentAreas

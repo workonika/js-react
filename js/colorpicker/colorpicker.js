@@ -141,37 +141,37 @@ var colorPicker = (function(){
             }
         });
 
-        var 
-            waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
-            startWayName = params.startWayName || "square",
-            startColorFormat = params.startColorFormat || "hex";
+        var commonParams = {
+            lang: lang,
+            startWayName: params.startWayName || "square",
+            startColorFormat: params.startColorFormat || "hex"
+        };
 
         var paramsOfcreateWidgetDOMElement = {
             widgetSize: { width: params.width || 350, height: params.height || 300 },
-            lang: lang,
-            waysOfGettingColorKeys: waysOfGettingColorKeys,
-            startWayName: startWayName,
-            startColorFormat: startColorFormat,
         };
 
-        var widgetDOM = createWidgetDOMElement(paramsOfcreateWidgetDOMElement);
+        var widgetDOM = createWidgetDOMElement( copyObject(commonParams, paramsOfcreateWidgetDOMElement) );
         document.body.appendChild(widgetDOM);
 
         var paramsOfBindEventListeners = {
             widgetDOM: widgetDOM,
             inputStackDOM: inputStackDOM,
-            getInputSizeAndPosition: getInputSizeAndPosition,
-            cssClasses: cssClasses,
-            waysOfGettingColorKeys: waysOfGettingColorKeys,
-            colorFormatsKeys: Object.keys(colorFormats[lang]),
-            startWayName: startWayName,
-            startColorFormat: startColorFormat,
-            colorNames: restructurize(colorNames),
         };
 
-        bindEventListeners(paramsOfBindEventListeners);
+        bindEventListeners( copyObject(commonParams, paramsOfBindEventListeners) );
 
     //конец функции colorPicker
+    }
+
+    function copyObject(from, to){
+        var keys = Object.keys(from);
+        
+        keys.forEach(function(key){
+            to[key] = from[key];
+        });
+        
+        return to;
     }
 
     //Получить размеры DOM-элемента, а также абсолютную позицию top, left
@@ -200,7 +200,7 @@ var colorPicker = (function(){
             div.classList.add(css.struct.widget.colorpicker);
 
         var innerHTML = { innerHTML: "<div class=" + css.content.widget.close + ">&times;</div>", },
-            waysOfGettingColorKeys = p.waysOfGettingColorKeys;
+            waysOfGettingColorKeys = Object.keys(wayOfGettingColor[p.lang]);
 
         var contentMapFn = {
             square: buildSquare.bind({css: css, colors: colorNames, }),
@@ -330,19 +330,20 @@ var colorPicker = (function(){
     }
 
     function bindEventListeners(params){
-
+        //Переменные значения которых переданы через параметр
         var p = params,
             widgetDOM = p.widgetDOM,
             inputStackDOM = p.inputStackDOM,
-            getInputSizeAndPosition = p.getInputSizeAndPosition,
-            css = p.cssClasses,
-            waysOfGettingColorKeys = p.waysOfGettingColorKeys,
             colorFormat = p.startColorFormat,
-            colorFormatsKeys = p.colorFormatsKeys,
-            startWayName = p.startWayName,
-            colorNames = p.colorNames,
-            colorNamesList = Object.keys(colorNames),
-            currentInput = undefined;
+            lang = p.lang,
+            startWayName = p.startWayName;
+
+        var css = cssClasses,
+            colorNamesMap = restructurize(colorNames),
+            currentInput = undefined,
+            waysOfGettingColorKeys = Object.keys(wayOfGettingColor[lang]),
+            colorFormatsKeys = Object.keys(colorFormats[lang]),
+            colorNamesList = Object.keys(colorNamesMap);
 
         var rgb = {r: undefined, g: undefined, b: undefined, colorname: undefined};
 
@@ -888,7 +889,7 @@ var colorPicker = (function(){
                 "colorname": function(value){
 
                     var valueTrimmed = value.trim();
-                    var rgb = colorNames[valueTrimmed];
+                    var rgb = colorNamesMap[valueTrimmed];
 
                     return {
                         r: rgb.r,
