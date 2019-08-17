@@ -10,6 +10,16 @@ var colorPicker = (function(){
                 name: "Слайдер",
                 order: 2
             },
+        },
+        en: {
+            square: {
+                name: "Prepared colors",
+                order: 0
+            },
+            slider: {
+                name: "Slider",
+                order: 2
+            },
         }
     };
     //Форматы цветов
@@ -27,6 +37,30 @@ var colorPicker = (function(){
                 name: "html названия цветов",
                 order: 3
             }
+        },
+        en: {
+            rgb: {
+                name: "rgb",
+                order: 0
+            }, 
+            hex: {
+                name: "hex",
+                order: 1
+            }, 
+            webnames: {
+                name: "html names of colors",
+                order: 3
+            }
+        }        
+    };
+    var sliderResultTextsMap = {
+        ru: {
+            resultText: "Результат:",
+            buttonText: "Выбрать этот цвет"
+        },
+        en: {
+            resultText: "Result:",
+            buttonText: "Choose this color"
         }
     };
     //Соответствие доступных форматов цветов способу получения цвета
@@ -204,7 +238,7 @@ var colorPicker = (function(){
 
         var contentMapFn = {
             square: buildSquare.bind({css: css, colors: colorNamesMap, }),
-            slider: buildSlider.bind({css: css}),
+            slider: buildSlider.bind({css: css, texts: sliderResultTextsMap[p.lang]}),
         };
         
         var widgetAreaMap = {};
@@ -290,17 +324,17 @@ var colorPicker = (function(){
                 + createInput(css.slideInput, css.g) 
                 + createInput(css.slideInput, css.b) + "</div>";
 
-            innerHTML += createResult(this.css.content.result.result, this.css.content.result.resultText, 
+            innerHTML += createResult(this.texts, this.css.content.result.result, this.css.content.result.resultText, 
                 this.css.content.result.choosed, this.css.content.result.confirm);
 
         return innerHTML;
     }
 
-    function createResult(result, result_text, choosed_result, confirm){
+    function createResult(texts, result, result_text, choosed_result, confirm){
         return "<div class='" + result + "'>"
-                + "<div class='" + result_text + "'>Результат:</div>"
+                + "<div class='" + result_text + "'>" + texts.resultText + "</div>"
                 + "<div class='" + choosed_result + "'></div>"
-                + "<button class='" + confirm + "'>Выбрать этот цвет</button>"
+                + "<button class='" + confirm + "'>" + texts.buttonText + "</button>"
             + "</div>";
     }
 
