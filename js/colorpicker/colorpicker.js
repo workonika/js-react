@@ -359,6 +359,10 @@ var colorPicker = (function(){
             return [].slice.call(widgetDOM.querySelectorAll("." + css.struct.ways[wayName]));
         });
 
+        var wayOfGettingColorDOMList = oneWayDifferrentAreas.map(function(list){
+            return list[0];
+        });
+
         var waysDOM = getElemsByWay(css.struct.zones.way),
             formatsDOM = getElemsByColorFormat(css.struct.zones.format),
             formatsDOMByWay = getElemsByWay(css.struct.zones.format),
@@ -500,7 +504,8 @@ var colorPicker = (function(){
         function switchWay(stack){
                 
             var index = -1,
-                currentCssClass;
+                currentCssClass,
+                matchDOM;
             
             stack.forEach(function(DOMElem){
                 waysOfGettingColorKeys.forEach(function(key, idx){
@@ -516,6 +521,14 @@ var colorPicker = (function(){
                     }
                 });
             })
+
+            matchingElements(stack, wayOfGettingColorDOMList, function(param){
+                matchDOM = param.match;
+            });
+
+            if(!matchDOM){
+                return false;
+            }
 
             oneWayDifferrentAreas.forEach(function(elemsGroup, idx){
                 elemsGroup.forEach(function(elem, ndx){
