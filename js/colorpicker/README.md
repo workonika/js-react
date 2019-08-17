@@ -1,14 +1,15 @@
 JS. Виджет "Colorpicker"
 ========================
-<./developer>
+
+
 
 Структуры данных виджета
 -------------------------
-    wayOfGettingColor
-    colorFormats
-    matchFormatToMethod
-    colorNames
-    cssClasses
+    wayOfGettingColorMap
+    colorFormatsMap
+    matchFormatToMethodMap
+    cssClassesMap
+    colorNamesMap
 
 Функции виджета
 ---------------
@@ -26,41 +27,36 @@ JS. Виджет "Colorpicker"
 
 Структуры данных функции colorPicker
 ------------------------------------
-    inputStackDOM
-    commonParams
+    inputStackDOMList
+    commonParamsMap
     paramsOfcreateWidgetDOMElement
     paramsOfBindEventListeners
 
 Структуры данных функции bindEventListeners
 --------------------------
-    rgba
-    oneWayDifferrentAreas
-    inputStackDOM
-    getInputSizeAndPosition
-    cssClassesForControl
-    waysOfGettingColorKeys
-    colorFormatsKeys
-    colorNames
+    rgbMap
+    oneWayDifferrentAreasList
+    colorFormatsKeysList
     colorNamesList
     squareDOMList
-    rectDOMList
     sliderDOMList
-    waysDOM
-    formatsDOM
-    contentDOM
-    contentAreaEventsHandles
-    stackOfElemsForMousemoveEvent
-    rgbaInputsList
+    waysDOMList
+    formatsDOMList
+    formatsDOMByWayList
+    contentsDOMList
+    contentAreaEventsHandlesFnList
+    rgbInputsList
     slidersList
+    webnamesDOMList
 
 Функции определенные внутри bindEventListeners
 --------------------------
     getDOM
-    getNestedElems
-    getDeepNestedElems
-    matchingElements
+    getElemsByWay
+    getElemsByColorFormat
+    matchElements
     clickInput
-    widgetEventsHandler
+    handleAllWidgetEvents
     switchWay
     chooseFormat
     getValue
@@ -68,30 +64,30 @@ JS. Виджет "Colorpicker"
     mouseup
     mousemove
     click
-    squareFn
-    rectFn
-    sliderFn
+    handleClickOnContentSquare
+    handleClickOnContentSlider
     clickClose
-    clickOutOfWidget
-    decToHEX
-    hexToDEC
-    validation
-    initRGBA
-    saveRGBA
-    hideWidget
-    displayWidget
-    traversalDOMUp
     createOutputValueString
-    endupChoice
+    clickOutOfWidget
+    convertDecToHEX
+    convertHexToDEC
+    initRGB
     setWebnameFocus
     setValueSliderInput
     setSlidersPosition
     setRGBThroughSlidersPosition
-    getColorFormatKeyByCssClass
-    applyDefaultValues
+    setSliderResultValue
     getKeyByName
-
-
+    saveRGB
+    hideWidget
+    endupChoice
+    displayWidget
+    applyDefaultValues
+    goThroughDOMNodesUp
+    setWebnameFocus
+    getColorFormatKeyByCssClass
+    
+    
 Идея заложенная в обработку событий клика в разных областях виджета colorpicker
 -------------------------------------------------------------------------------
 
